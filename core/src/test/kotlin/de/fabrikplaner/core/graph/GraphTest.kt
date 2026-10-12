@@ -8,6 +8,7 @@ import de.fabrikplaner.core.model.TargetRate
 import de.fabrikplaner.core.solver.ProductionSolver
 import de.fabrikplaner.core.solver.assertClose
 import kotlin.math.abs
+import kotlin.math.hypot
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -209,10 +210,70 @@ class GraphTest {
     }
 
     @Test
-    fun differentSourcePortsDoNotShareALine() {
-        assertPortsStayApart("motor", 10.0)
-        assertPortsStayApart("heavy_modular_frame", 1.0)
-        assertPortsStayApart("plastic", 20.0)
+    fun edgesHaveAtMostTwoBendsAndNoMicroJogs() {
+        for ((itemId, rate) in listOf("motor" to 10.0, "heavy_modular_frame" to 1.0, "plastic" to 20.0)) {
+            val graph = solvedGraph(itemId, rate)
+            val routes = EdgeRouter.paths(graph.nodes, graph.edges, game)
+            for (route in routes) {
+                val bends = EdgeRouter.bendCount(route.points)
+                assertTrue(bends <= 2, "$itemId ${route.edgeId} has $bends bends ${route.points}")
+                val points = route.points
+                for (index in 0 until points.lastIndex) {
+                    val length = segmentLength(points[index], points[index + 1])
+                    if (length <= 0.05f) continue
+                    assertTrue(
+                        length >= EdgeRouter.MIN_SEGMENT - 0.2f,
+                        "$itemId ${route.edgeId} segment $length ${points[index]} -> ${points[index + 1]}",
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun parallelRunsKeepAVisibleGap() {
+        for ((itemId, rate) in listOf("motor" to 10.0, "heavy_modular_frame" to 1.0, "plastic" to 20.0)) {
+            val graph = solvedGraph(itemId, rate)
+            val routes = EdgeRouter.paths(graph.nodes, graph.edges, game)
+            val strokes = EdgeRouter.strokes(graph.edges, routes)
+            for (i in strokes.indices) {
+                for (j in i + 1 until strokes.size) {
+                    val a = strokes[i]
+                    val b = strokes[j]
+                    val aHorizontal = abs(a.a.y - a.b.y) <= 0.5f
+                    val bHorizontal = abs(b.a.y - b.b.y) <= 0.5f
+                    if (aHorizontal && bHorizontal) {
+                        val overlap = overlapLength(a.a.x, a.b.x, b.a.x, b.b.x)
+                        val gap = abs(a.a.y - b.a.y)
+                        if (overlap > 64f && gap > 0.5f) {
+                            assertTrue(
+                                gap >= 28f,
+                                "$itemId horizontal gap $gap overlap $overlap a=${a.a}-${a.b} ${a.itemIds} b=${b.a}-${b.b} ${b.itemIds}",
+                            )
+                        }
+                    }
+                    val aVertical = abs(a.a.x - a.b.x) <= 0.5f
+                    val bVertical = abs(b.a.x - b.b.x) <= 0.5f
+                    if (aVertical && bVertical) {
+                        val overlap = overlapLength(a.a.y, a.b.y, b.a.y, b.b.y)
+                        val gap = abs(a.a.x - b.a.x)
+                        if (overlap > 8f && gap > 0.5f) {
+                            assertTrue(gap >= EdgeRouter.LANE_PITCH - 0.5f, "$itemId vertical gap $gap overlap $overlap")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun visibleSegmentsDoNotOverlap() {
+        for ((itemId, rate) in listOf("motor" to 10.0, "heavy_modular_frame" to 1.0, "plastic" to 20.0)) {
+            val graph = solvedGraph(itemId, rate)
+            val routes = EdgeRouter.paths(graph.nodes, graph.edges, game)
+            val overlaps = EdgeRouter.illegalOverlaps(graph.edges, routes)
+            assertTrue(overlaps.isEmpty(), "$itemId: ${overlaps.joinToString()}")
+        }
     }
 
     @Test
@@ -239,41 +300,22 @@ class GraphTest {
         assertTrue(screwPort.second < platePort.second)
     }
 
-    private fun assertPortsStayApart(itemId: String, rate: Double) {
-        val targets = listOf(TargetRate(itemId, rate))
-        val solved = ProductionSolver(game).solve(targets)
-        val graph = GraphLayout.fromSolution(solved, targets, game)
-        val routes = EdgeRouter.paths(graph.nodes, graph.edges, game)
-        val overlaps = EdgeRouter.differentPortOverlaps(graph.edges, routes)
-        assertTrue(overlaps.isEmpty(), "$itemId: ${overlaps.joinToString()}")
-        if (itemId == "motor") {
-            val shared = EdgeRouter.strokes(graph.edges, routes).any { stroke ->
-                val users = graph.edges.filter { edge ->
-                    val route = routes.single { it.edgeId == edge.id }
-                    route.points.zipWithNext().any { (a, b) ->
-                        collinearPiece(a, b, stroke.a, stroke.b)
-                    }
-                }
-                users.map { it.fromNodeId to it.itemId }.distinct().size == 1 && users.size > 1
-            }
-            assertTrue(shared, "one iron output should keep a single shared trunk")
-        }
+    private fun overlapLength(a0: Float, a1: Float, b0: Float, b1: Float): Float {
+        val left = maxOf(minOf(a0, a1), minOf(b0, b1))
+        val right = minOf(maxOf(a0, a1), maxOf(b0, b1))
+        return right - left
     }
 
-    private fun collinearPiece(
-        a: de.fabrikplaner.core.graph.RoutePoint,
-        b: de.fabrikplaner.core.graph.RoutePoint,
-        c: de.fabrikplaner.core.graph.RoutePoint,
-        d: de.fabrikplaner.core.graph.RoutePoint,
-    ): Boolean {
-        val horizontal = abs(a.y - b.y) <= 0.5f && abs(c.y - d.y) <= 0.5f && abs(a.y - c.y) <= 0.5f
-        val vertical = abs(a.x - b.x) <= 0.5f && abs(c.x - d.x) <= 0.5f && abs(a.x - c.x) <= 0.5f
-        if (!horizontal && !vertical) return false
-        val a0 = if (horizontal) minOf(a.x, b.x) else minOf(a.y, b.y)
-        val a1 = if (horizontal) maxOf(a.x, b.x) else maxOf(a.y, b.y)
-        val c0 = if (horizontal) minOf(c.x, d.x) else minOf(c.y, d.y)
-        val c1 = if (horizontal) maxOf(c.x, d.x) else maxOf(c.y, d.y)
-        return minOf(a1, c1) - maxOf(a0, c0) > 1.5f
+    private fun segmentLength(a: RoutePoint, b: RoutePoint): Float {
+        val dx = (a.x - b.x).toDouble()
+        val dy = (a.y - b.y).toDouble()
+        return hypot(dx, dy).toFloat()
+    }
+
+    private fun solvedGraph(itemId: String, rate: Double): FactoryGraph {
+        val targets = listOf(TargetRate(itemId, rate))
+        val solved = ProductionSolver(game).solve(targets)
+        return GraphLayout.fromSolution(solved, targets, game)
     }
 
     private fun assertRoutesClear(itemId: String, rate: Double) {

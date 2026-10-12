@@ -55,7 +55,7 @@ Siehe [docs/gamedata.md](docs/gamedata.md). Kurz: `tools/build_game_data.py` erz
 - Förderer-Stufen und Durchsatzgrenzen (Mk.1–Mk.6, Pipes) werden nicht geprüft.
 - Kein Fundamentraster, keine Kollision, kein Gebäude-Footprint.
 - Alternativen werden nicht automatisch optimiert. Vor dem Graph und später im Editor lässt sich das Rezept je Teil wählen.
-- Das automatische Layout ist eine Sugiyama-Anordnung (Schichten von links nach rechts, Kreuzungen per Barycenter reduziert). Kanten, die mehrere Schichten überspringen, laufen rechtwinklig durch Gassen zwischen den Karten und nicht durch fremde Knoten. Ausgänge verschiedener Knoten liegen auf eigenen parallelen Spuren. Dieselbe Leitung aus einem Ausgang bleibt eine Linie; teilen sich verschiedene Teile ein Stück, wechseln sich ihre Farben gestrichelt ab. Es bleibt ein Schema, kein Fabrikbau auf Fundamenten.
+- Das automatische Layout ist eine Sugiyama-Anordnung (Schichten von links nach rechts, Kreuzungen per Barycenter reduziert). Die Knoten werden in der Höhe so verschoben, dass zusammengehörige Ports auf einer Linie liegen. Jede Kante ist dann gerade oder hat genau einen Knick in der Gasse; Abschnitte unter 36 dp gibt es nicht. Nach einer Verzweigung laufen die Äste auf getrennten Spuren, ein gemeinsames Stück gibt es nur bis zum Split bzw. in den letzten Ansatz eines Eingangs. Es bleibt ein Schema, kein Fabrikbau auf Fundamenten.
 - Die Kantenanker und das Layout sind über die JVM-Tests abgesichert. Ein Emulator in der Build-Umgebung blieb vor dem Android-Start stehen, deshalb gibt es dazu eine Geometriezeichnung und keine Geräteaufnahme.
 
 ## Nächste Schritte
