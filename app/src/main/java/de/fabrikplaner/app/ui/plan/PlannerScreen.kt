@@ -221,6 +221,8 @@ fun PlannerScreen(
         RecipePickerDialog(
             game = viewModel.game,
             itemId = recipeItem,
+            selection = viewModel.current?.recipeSelection.orEmpty(),
+            solve = viewModel::preview,
             onDismiss = { recipeForItem = null },
             onPick = { recipeId ->
                 viewModel.selectRecipe(recipeItem, recipeId)

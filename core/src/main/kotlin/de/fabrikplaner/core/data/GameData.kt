@@ -37,10 +37,19 @@ class GameData(file: GameDataFile) {
     fun outputRate(recipe: Recipe, itemId: String): Double =
         recipe.outputs.filter { it.itemId == itemId }.sumOf { perMinute(it, recipe) }
 
-    /** Recipes whose first output is [itemId], standard recipes first. */
-    fun recipesProducing(itemId: String): List<Recipe> =
-        recipes.filter { it.outputs.firstOrNull()?.itemId == itemId }
-            .sortedWith(compareBy({ it.alternate }, { it.id }))
+    /**
+     * Recipes whose first output is [itemId]. The item default (or the unique
+     * standard recipe) comes first, then other standards, then alternates by id.
+     * Selection never changes this order.
+     */
+    fun recipesProducing(itemId: String): List<Recipe> {
+        val producing = recipes.filter { it.outputs.firstOrNull()?.itemId == itemId }
+        val defaultId = itemOrNull(itemId)?.defaultRecipeId
+            ?: producing.singleOrNull { !it.alternate }?.id
+        return producing.sortedWith(
+            compareBy<Recipe>({ if (it.id == defaultId) 0 else 1 }, { it.alternate }, { it.id }),
+        )
+    }
 
     /**
      * Recipe used to craft [itemId]. An explicit selection wins when that recipe's

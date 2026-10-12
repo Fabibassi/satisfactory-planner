@@ -4,7 +4,7 @@ Native Android-App (Kotlin, Jetpack Compose) zum Planen von Satisfactory-Fabrike
 
 Zwei Modi teilen sich denselben Plan:
 
-1. **Automatische Berechnung.** Zielgegenstände und Raten pro Minute wählen (zum Beispiel 10 Motoren/min). Der Solver löst die Kette bei 100 % Takt: Maschinen (auch anteilig), aufgerundete Stückzahl, Rohstoffe, Nebenprodukte und Leistung. Alternativrezepte lassen sich pro Gegenstand umschalten.
+1. **Automatische Berechnung.** Zielgegenstände und Raten pro Minute wählen (zum Beispiel 10 Motoren/min). Der Solver löst die Kette bei 100 % Takt: Maschinen (auch anteilig), aufgerundete Stückzahl, Rohstoffe, Nebenprodukte und Leistung. Alternativrezepte lassen sich pro Gegenstand umschalten. Die Liste bleibt dabei in fester Reihenfolge (Gegenstand, Standardrezept zuerst). Ein Fragezeichen neben der Alternative stellt sie dem Standardrezept gegenüber: Eingänge und Ausgänge pro Minute, Gebäude, Taktzeit, Leistung und die Wirkung auf Rohstoffe, Maschinen und Leistung des aktuellen Plans.
 2. **Freier Graph.** Maschinen, Quellen, Senken, Splitter und Merger auf einer Fläche mit Verschieben und Zoom platzieren. Ausgänge auf Eingänge ziehen, Bänder (fest) und Rohre (flüssig) unterscheiden sich farblich. Die Raten laufen live durch und zeigen Über- oder Unterproduktion. Ein erzeugter Graph bleibt im selben Editor editierbar.
 
 Pläne liegen als JSON unter dem App-Dateiverzeichnis und überstehen einen Neustart.

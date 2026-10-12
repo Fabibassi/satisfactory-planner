@@ -254,6 +254,8 @@ fun EditorScreen(
         RecipePickerDialog(
             game = viewModel.game,
             itemId = chosenItem,
+            selection = viewModel.current?.recipeSelection.orEmpty(),
+            solve = viewModel::preview,
             onDismiss = {
                 picker = Picker.NONE
                 recipeItem = null
@@ -269,6 +271,8 @@ fun EditorScreen(
         RecipePickerDialog(
             game = viewModel.game,
             itemId = chosenItem,
+            selection = viewModel.current?.recipeSelection.orEmpty(),
+            solve = viewModel::preview,
             onDismiss = {
                 picker = Picker.NONE
                 recipeItem = null

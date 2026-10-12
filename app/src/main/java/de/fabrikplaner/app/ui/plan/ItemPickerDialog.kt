@@ -17,10 +17,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import de.fabrikplaner.app.R
 import de.fabrikplaner.app.ui.currentLocale
@@ -28,6 +31,7 @@ import de.fabrikplaner.app.ui.icon.BuildingGlyph
 import de.fabrikplaner.app.ui.icon.ItemGlyph
 import de.fabrikplaner.app.ui.localized
 import de.fabrikplaner.app.ui.parsePositive
+import de.fabrikplaner.core.solver.SolverResult
 import de.fabrikplaner.core.data.GameData
 
 private val categoryOrder = listOf(
@@ -110,12 +114,16 @@ fun ItemPickerDialog(
 fun RecipePickerDialog(
     game: GameData,
     itemId: String,
+    selection: Map<String, String> = emptyMap(),
+    solve: ((Map<String, String>) -> SolverResult)? = null,
     onDismiss: () -> Unit,
     onPick: (recipeId: String) -> Unit,
 ) {
     val locale = currentLocale()
     val item = game.itemOrNull(itemId)
     val recipes = game.recipesProducing(itemId)
+    val defaultId = game.recipeFor(itemId)?.id
+    var compare by remember { mutableStateOf<RecipeCompareRequest?>(null) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(item?.localized(locale) ?: stringResource(R.string.choose_recipe)) },
@@ -129,16 +137,25 @@ fun RecipePickerDialog(
                     }
                     val building = game.buildingOrNull(recipe.buildingId)?.name?.localized(locale).orEmpty()
                     val recipeName = recipe.name.localized(locale)
-                    PickerRow(
-                        "$recipeName · $badge · $building",
-                        {
-                            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                                ItemGlyph(item?.localized(locale) ?: recipeName, itemId, item?.form, size = 28.dp)
-                                BuildingGlyph(building, recipe.buildingId, modifier = Modifier.padding(start = 4.dp), size = 22.dp)
-                            }
-                        },
-                    ) {
-                        onPick(recipe.id)
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            Modifier
+                                .weight(1f)
+                                .clickable { onPick(recipe.id) },
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            ItemGlyph(item?.localized(locale) ?: recipeName, itemId, item?.form, size = 28.dp)
+                            BuildingGlyph(building, recipe.buildingId, modifier = Modifier.padding(start = 4.dp), size = 22.dp)
+                            Text(
+                                "$recipeName · $badge · $building",
+                                modifier = Modifier.padding(start = 8.dp).weight(1f),
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                        if (solve != null && recipe.id != defaultId) {
+                            RecipeCompareButton { compare = RecipeCompareRequest(itemId, recipe.id) }
+                        }
                     }
                 }
             }
@@ -146,6 +163,16 @@ fun RecipePickerDialog(
         confirmButton = {},
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
+    val solvePlan = solve
+    if (solvePlan != null) {
+        RecipeCompareHost(
+            game = game,
+            selection = selection,
+            solve = solvePlan,
+            request = compare,
+            onDismiss = { compare = null },
+        )
+    }
 }
 
 @Composable

@@ -84,7 +84,6 @@ fun AppRoot(viewModel: PlannerViewModel) {
             game = viewModel.game,
             initialSelection = viewModel.current?.recipeSelection.orEmpty(),
             solve = viewModel::preview,
-            choiceItems = viewModel::choiceItemIds,
             onDismiss = viewModel::dismissRecipePrompt,
             onApply = { selection ->
                 val openEditor = stack.last() is Screen.Planner

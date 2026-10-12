@@ -17,6 +17,7 @@ import de.fabrikplaner.core.model.TargetRate
 import de.fabrikplaner.core.persistence.PlanRepository
 import de.fabrikplaner.core.solver.ProductionSolver
 import de.fabrikplaner.core.solver.SolverResult
+import de.fabrikplaner.core.solver.orderedChoiceItemIds
 import java.util.UUID
 
 class PlannerViewModel(
@@ -94,11 +95,7 @@ class PlannerViewModel(
 
     fun choiceItemIds(solved: SolverResult?): List<String> {
         if (solved == null) return emptyList()
-        return solved.machines.mapNotNull { machine ->
-            val recipe = machine.recipeId?.let { game.recipeOrNull(it) } ?: return@mapNotNull null
-            val itemId = recipe.outputs.firstOrNull()?.itemId ?: return@mapNotNull null
-            if (game.recipesProducing(itemId).size > 1) itemId else null
-        }.distinct()
+        return orderedChoiceItemIds(game, solved)
     }
 
     fun confirmRecipes(selection: Map<String, String>, rebuildGraph: Boolean) {
