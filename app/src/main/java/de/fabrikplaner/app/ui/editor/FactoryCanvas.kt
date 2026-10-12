@@ -35,6 +35,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -121,9 +122,11 @@ fun FactoryCanvas(
     val onMoveEndState = rememberUpdatedState(onMoveEnd)
     val onConnectState = rememberUpdatedState(onConnect)
     var rubberBand by remember { mutableStateOf<Pair<Offset, Offset>?>(null) }
-    val routePoints = EdgeRouter.paths(plan.nodes, plan.edges, game).associate { route ->
+    val routes = EdgeRouter.paths(plan.nodes, plan.edges, game)
+    val routePoints = routes.associate { route ->
         route.edgeId to route.points.map { Offset(it.x, it.y) }
     }
+    val strokes = EdgeRouter.strokes(plan.edges, routes)
     val edgeDraws = plan.edges.mapNotNull { edge ->
         val from = plan.nodes.find { it.id == edge.fromNodeId } ?: return@mapNotNull null
         val to = plan.nodes.find { it.id == edge.toNodeId } ?: return@mapNotNull null
@@ -243,16 +246,33 @@ fun FactoryCanvas(
             ) {
                 Canvas(Modifier.size(8000.dp, 8000.dp)) {
                     fun px(world: Offset) = Offset(world.x * densityScale, world.y * densityScale)
-                    edgeDraws.forEach { edge ->
+                    strokes.forEach { stroke ->
+                        val start = px(Offset(stroke.a.x, stroke.a.y))
+                        val end = px(Offset(stroke.b.x, stroke.b.y))
                         val path = Path().apply {
-                            val first = px(edge.points.first())
-                            moveTo(first.x, first.y)
-                            edge.points.drop(1).forEach { point ->
-                                val next = px(point)
-                                lineTo(next.x, next.y)
+                            moveTo(start.x, start.y)
+                            lineTo(end.x, end.y)
+                        }
+                        if (stroke.itemIds.size <= 1) {
+                            val key = stroke.itemIds.firstOrNull().orEmpty()
+                            drawPath(path, glyphColor(key), style = Stroke(width = 5f))
+                        } else {
+                            val dash = 16f
+                            val gap = dash * (stroke.itemIds.size - 1)
+                            stroke.itemIds.forEachIndexed { index, itemId ->
+                                drawPath(
+                                    path,
+                                    glyphColor(itemId),
+                                    style = Stroke(
+                                        width = 5f,
+                                        pathEffect = PathEffect.dashPathEffect(
+                                            floatArrayOf(dash, gap),
+                                            phase = dash * index,
+                                        ),
+                                    ),
+                                )
                             }
                         }
-                        drawPath(path, if (edge.liquid) PipeLiquid else BeltSolid, style = Stroke(width = 5f))
                     }
                     rubberBand?.let { (start, end) ->
                         drawLine(Color.White, px(start), px(end), strokeWidth = 4f)

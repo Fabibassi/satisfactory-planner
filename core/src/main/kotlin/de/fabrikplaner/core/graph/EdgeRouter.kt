@@ -11,6 +11,8 @@ data class RoutePoint(val x: Float, val y: Float)
 
 data class EdgeRoute(val edgeId: String, val points: List<RoutePoint>)
 
+data class EdgeStroke(val a: RoutePoint, val b: RoutePoint, val itemIds: List<String>)
+
 /**
  * Orthogonal routes that stay in the gaps between columns and in channels between cards.
  * A segment may touch the port of its own endpoints. It must not cross any other card.
@@ -18,11 +20,14 @@ data class EdgeRoute(val edgeId: String, val points: List<RoutePoint>)
 object EdgeRouter {
     const val CLEARANCE = 36f
     const val LANE_PITCH = 24f
+    const val TRACK_PITCH = 18f
+    const val GUTTER_MARGIN = 20f
 
     fun openChannels(nodes: List<GraphNode>, edges: List<GraphEdge>): List<GraphNode> {
         if (nodes.isEmpty()) return nodes
         val yById = channelTops(nodes, edges)
-        return nodes.map { node -> yById[node.id]?.let { node.copy(y = it) } ?: node }
+        val shifted = nodes.map { node -> yById[node.id]?.let { node.copy(y = it) } ?: node }
+        return spreadColumns(shifted, edges)
     }
 
     fun paths(nodes: List<GraphNode>, edges: List<GraphEdge>, game: GameData): List<EdgeRoute> {
@@ -32,14 +37,60 @@ object EdgeRouter {
         val layerOf: (GraphNode) -> Int = { node -> xs.indexOf(node.x).coerceAtLeast(0) }
         val columns = xs.indices.map { index -> nodes.filter { layerOf(it) == index }.sortedBy { it.y } }
         val used = xs.indices.associateWith { mutableListOf<Float>() }
+        val tracks = tracksByGutter(nodes, edges, layerOf, xs)
+        val reserve = HorizontalReserve()
+        fun slotOf(gutter: Int, key: SourcePort): GutterSlot =
+            tracks[gutter]?.get(key) ?: GutterSlot(gutterCenter(xs, gutter), gutterCenter(xs, gutter))
+        for (edge in edges) {
+            val from = byId[edge.fromNodeId] ?: continue
+            val to = byId[edge.toNodeId] ?: continue
+            val source = layerOf(from)
+            val dest = layerOf(to)
+            if (source == dest) continue
+            val key = SourcePort(edge.fromNodeId, edge.itemId)
+            val start = port(from, edge.itemId, game, nodes, edges, output = true)
+            val end = port(to, edge.itemId, game, nodes, edges, output = false)
+            val forward = source < dest
+            val entry = if (forward) source else source - 1
+            val exit = if (forward) dest - 1 else dest
+            reserve.add(key, start.y, start.x, slotOf(entry, key).spine)
+            reserve.add(key, end.y, slotOf(exit, key).join, end.x)
+        }
         return edges.mapNotNull { edge ->
             val from = byId[edge.fromNodeId] ?: return@mapNotNull null
             val to = byId[edge.toNodeId] ?: return@mapNotNull null
             val start = port(from, edge.itemId, game, nodes, edges, output = true)
             val end = port(to, edge.itemId, game, nodes, edges, output = false)
-            val points = orthogonal(from, to, start, end, layerOf, columns, xs, used)
+            val key = SourcePort(edge.fromNodeId, edge.itemId)
+            val points = orthogonal(from, to, start, end, layerOf, columns, used, reserve, key) { gutter ->
+                slotOf(gutter, key)
+            }
             EdgeRoute(edge.id, simplify(points))
         }
+    }
+
+    /**
+     * One solid stroke per piece of geometry. Same item sharing a trunk collapses to one line.
+     * Different items on the same line come back together so the canvas can alternate their colors.
+     */
+    fun strokes(edges: List<GraphEdge>, routes: List<EdgeRoute>): List<EdgeStroke> =
+        pieces(edges, routes).map { piece ->
+            val itemIds = piece.spans.map { it.itemId }.distinct().sorted()
+            val a = if (piece.horizontal) RoutePoint(piece.from, piece.fixed) else RoutePoint(piece.fixed, piece.from)
+            val b = if (piece.horizontal) RoutePoint(piece.to, piece.fixed) else RoutePoint(piece.fixed, piece.to)
+            EdgeStroke(a, b, itemIds)
+        }
+
+    fun differentPortOverlaps(edges: List<GraphEdge>, routes: List<EdgeRoute>): List<String> {
+        val problems = mutableListOf<String>()
+        for (piece in pieces(edges, routes)) {
+            if (piece.to - piece.from <= 1.5f) continue
+            val ports = piece.spans.map { it.port }.distinct()
+            if (ports.size <= 1) continue
+            val where = if (piece.horizontal) "y=${piece.fixed}" else "x=${piece.fixed}"
+            problems += "${ports.joinToString(" & ")} overlap at $where ${piece.from}..${piece.to}"
+        }
+        return problems.distinct()
     }
 
     fun violations(
@@ -144,18 +195,19 @@ object EdgeRouter {
         end: RoutePoint,
         layerOf: (GraphNode) -> Int,
         columns: List<List<GraphNode>>,
-        xs: List<Float>,
         used: Map<Int, MutableList<Float>>,
+        reserve: HorizontalReserve,
+        portKey: SourcePort,
+        slot: (Int) -> GutterSlot,
     ): List<RoutePoint> {
         val srcLayer = layerOf(from)
         val dstLayer = layerOf(to)
         val points = mutableListOf(start)
-        if (srcLayer == dstLayer) {
-            val column = columns.getOrElse(srcLayer) { emptyList() }
-            val above = (column.minOfOrNull { it.y } ?: start.y) - CLEARANCE - LANE_PITCH
-            val lane = reserve(used.getValue(srcLayer), above, above)
-            val right = from.x + GraphMetrics.CARD_W + CLEARANCE
-            val left = to.x - CLEARANCE
+        if (srcLayer == dstLayer || srcLayer > dstLayer) {
+            val above = min(start.y, end.y) - CLEARANCE - LANE_PITCH
+            val lane = reserve.claimOpen(portKey, above, start.x, end.x)
+            val right = start.x + CLEARANCE
+            val left = end.x - CLEARANCE
             points += RoutePoint(right, start.y)
             points += RoutePoint(right, lane)
             points += RoutePoint(left, lane)
@@ -163,25 +215,86 @@ object EdgeRouter {
             points += end
             return points
         }
-        val forward = srcLayer < dstLayer
-        val firstGutter = gutter(xs, if (forward) srcLayer else srcLayer - 1)
-        points += RoutePoint(firstGutter, start.y)
-        var gutterX = firstGutter
-        var layer = srcLayer
-        while (layer != dstLayer) {
-            val next = if (forward) layer + 1 else layer - 1
-            if (next == dstLayer) break
-            val preferred = lerp(start.y, end.y, abs(next - srcLayer).toFloat() / abs(dstLayer - srcLayer))
-            val lane = pickLane(columns[next], preferred, used.getValue(next))
-            val nextGutter = gutter(xs, if (forward) next else next - 1)
-            points += RoutePoint(gutterX, lane)
-            points += RoutePoint(nextGutter, lane)
-            gutterX = nextGutter
-            layer = next
+        val first = slot(srcLayer)
+        points += RoutePoint(first.spine, start.y)
+        var x = first.spine
+        var y = start.y
+        var gutter = srcLayer
+        while (gutter < dstLayer) {
+            val join = slot(gutter).join
+            val reachesDest = gutter + 1 == dstLayer
+            if (reachesDest) {
+                val crossY = reserve.claimOpen(portKey, (y + end.y) / 2f, x, join)
+                if (abs(y - crossY) > 0.01f) points += RoutePoint(x, crossY)
+                points += RoutePoint(join, crossY)
+                if (abs(crossY - end.y) > 0.01f) points += RoutePoint(join, end.y)
+                points += end
+                break
+            }
+            val nextSpine = slot(gutter + 1).spine
+            val preferred = lerp(start.y, end.y, (gutter + 1 - srcLayer).toFloat() / (dstLayer - srcLayer))
+            val lane = claimColumnLane(portKey, preferred, x, nextSpine, columns[gutter + 1], used.getValue(gutter + 1), reserve)
+            if (abs(y - lane) > 0.01f) points += RoutePoint(x, lane)
+            points += RoutePoint(nextSpine, lane)
+            x = nextSpine
+            y = lane
+            gutter += 1
         }
-        points += RoutePoint(gutterX, end.y)
-        points += end
         return points
+    }
+
+    private fun claimColumnLane(
+        portKey: SourcePort,
+        preferred: Float,
+        x0: Float,
+        x1: Float,
+        column: List<GraphNode>,
+        used: MutableList<Float>,
+        reserve: HorizontalReserve,
+    ): Float {
+        var lane = pickLane(column, preferred, used)
+        var guard = 0
+        while (reserve.conflicts(portKey, lane, x0, x1) && guard < 16) {
+            lane = pickLane(column, preferred, used)
+            guard++
+        }
+        reserve.add(portKey, lane, x0, x1)
+        return lane
+    }
+
+    private class HorizontalReserve {
+        private data class Run(val port: SourcePort, val y: Float, val x0: Float, val x1: Float)
+
+        private val runs = mutableListOf<Run>()
+
+        fun add(port: SourcePort, y: Float, a: Float, b: Float) {
+            val x0 = min(a, b)
+            val x1 = max(a, b)
+            if (x1 - x0 <= 0.5f) return
+            runs += Run(port, y, x0, x1)
+        }
+
+        fun conflicts(port: SourcePort, y: Float, a: Float, b: Float): Boolean {
+            val x0 = min(a, b)
+            val x1 = max(a, b)
+            return runs.any { other ->
+                other.port != port &&
+                    abs(other.y - y) < 0.75f &&
+                    min(x1, other.x1) - max(x0, other.x0) > 1.5f
+            }
+        }
+
+        fun claimOpen(port: SourcePort, preferred: Float, a: Float, b: Float): Float {
+            var y = preferred
+            var step = 0
+            while (conflicts(port, y, a, b) && step < 40) {
+                step++
+                val sign = if (step % 2 == 1) 1f else -1f
+                y = preferred + sign * ((step + 1) / 2) * TRACK_PITCH
+            }
+            add(port, y, a, b)
+            return y
+        }
     }
 
     private fun pickLane(column: List<GraphNode>, preferred: Float, used: MutableList<Float>): Float {
@@ -226,13 +339,6 @@ object EdgeRouter {
             .minByOrNull { abs(it - preferred) }
     }
 
-    private fun reserve(used: MutableList<Float>, preferred: Float, fallback: Float): Float {
-        var y = preferred
-        while (used.any { abs(it - y) < LANE_PITCH - 0.5f }) y = fallback - (used.size + 1) * LANE_PITCH
-        used += y
-        return y
-    }
-
     private fun freeIntervals(column: List<GraphNode>): List<Pair<Float, Float>> {
         if (column.isEmpty()) return listOf(Float.NEGATIVE_INFINITY to Float.POSITIVE_INFINITY)
         val sorted = column.sortedBy { it.y }
@@ -247,10 +353,140 @@ object EdgeRouter {
         return gaps
     }
 
-    private fun gutter(xs: List<Float>, layer: Int): Float {
-        val left = xs[layer] + GraphMetrics.CARD_W
-        val right = xs[layer + 1]
+    private data class SourcePort(val nodeId: String, val itemId: String)
+
+    private data class Span(
+        val itemId: String,
+        val port: SourcePort,
+        val horizontal: Boolean,
+        val fixed: Float,
+        val from: Float,
+        val to: Float,
+    )
+
+    private data class Piece(
+        val horizontal: Boolean,
+        val fixed: Float,
+        val from: Float,
+        val to: Float,
+        val spans: List<Span>,
+    )
+
+    private fun spreadColumns(nodes: List<GraphNode>, edges: List<GraphEdge>): List<GraphNode> {
+        val xs = nodes.map { it.x }.distinct().sorted()
+        if (xs.size < 2) return nodes
+        val layerOf = nodes.associate { it.id to xs.indexOf(it.x) }
+        val ports = Array(xs.size - 1) { linkedSetOf<SourcePort>() }
+        for (edge in edges) {
+            val a = layerOf[edge.fromNodeId] ?: continue
+            val b = layerOf[edge.toNodeId] ?: continue
+            if (a == b) continue
+            val lo = min(a, b)
+            val hi = max(a, b)
+            for (gutter in lo until hi) ports[gutter] += SourcePort(edge.fromNodeId, edge.itemId)
+        }
+        val gap = FloatArray(xs.size - 1) { index ->
+            val count = ports[index].size.coerceAtLeast(1)
+            val bundles = if (count <= 1) 0f else 2f * (count - 1) * TRACK_PITCH + TRACK_PITCH
+            val need = GUTTER_MARGIN * 2f + bundles
+            max(GraphMetrics.GAP_X, need)
+        }
+        val newX = FloatArray(xs.size)
+        newX[0] = xs[0]
+        for (index in 1 until xs.size) {
+            newX[index] = newX[index - 1] + GraphMetrics.CARD_W + gap[index - 1]
+        }
+        return nodes.map { node ->
+            val layer = layerOf[node.id] ?: return@map node
+            node.copy(x = newX[layer])
+        }
+    }
+
+    private data class GutterSlot(val spine: Float, val join: Float)
+
+    private fun tracksByGutter(
+        nodes: List<GraphNode>,
+        edges: List<GraphEdge>,
+        layerOf: (GraphNode) -> Int,
+        xs: List<Float>,
+    ): Map<Int, Map<SourcePort, GutterSlot>> {
+        val byId = nodes.associateBy { it.id }
+        val ports = HashMap<Int, LinkedHashSet<SourcePort>>()
+        for (edge in edges) {
+            val from = byId[edge.fromNodeId] ?: continue
+            val to = byId[edge.toNodeId] ?: continue
+            val source = layerOf(from)
+            val dest = layerOf(to)
+            if (source == dest) continue
+            val lo = min(source, dest)
+            val hi = max(source, dest)
+            for (gutter in lo until hi) {
+                ports.getOrPut(gutter) { linkedSetOf() } += SourcePort(edge.fromNodeId, edge.itemId)
+            }
+        }
+        return ports.mapValues { (gutter, keys) ->
+            val ordered = keys.sortedWith(compareBy({ byId[it.nodeId]?.y ?: 0f }, { it.nodeId }, { it.itemId }))
+            val left = xs[gutter] + GraphMetrics.CARD_W
+            val right = xs.getOrElse(gutter + 1) { left + GraphMetrics.GAP_X }
+            val count = ordered.size
+            if (count <= 1) {
+                val mid = (left + right) / 2f
+                return@mapValues ordered.associateWith { GutterSlot(mid, mid) }
+            }
+            val usable = (right - left - 2f * GUTTER_MARGIN).coerceAtLeast(TRACK_PITCH)
+            val pitch = min(TRACK_PITCH, usable / (2f * (count - 1) + 1f))
+            ordered.mapIndexed { index, key ->
+                val spine = left + GUTTER_MARGIN + index * pitch
+                val join = right - GUTTER_MARGIN - index * pitch
+                key to GutterSlot(spine, join)
+            }.toMap()
+        }
+    }
+
+    private fun gutterCenter(xs: List<Float>, gutter: Int): Float {
+        val left = xs[gutter] + GraphMetrics.CARD_W
+        val right = xs.getOrElse(gutter + 1) { left + GraphMetrics.GAP_X }
         return (left + right) / 2f
+    }
+
+    private fun pieces(edges: List<GraphEdge>, routes: List<EdgeRoute>): List<Piece> {
+        val byRoute = routes.associateBy { it.edgeId }
+        val spans = mutableListOf<Span>()
+        for (edge in edges) {
+            val route = byRoute[edge.id] ?: continue
+            val port = SourcePort(edge.fromNodeId, edge.itemId)
+            val points = route.points
+            for (index in 0 until points.lastIndex) {
+                val a = points[index]
+                val b = points[index + 1]
+                val dx = abs(a.x - b.x)
+                val dy = abs(a.y - b.y)
+                if (dx < 0.01f && dy < 0.01f) continue
+                if (dy <= 0.5f && dx > 0.5f) {
+                    spans += Span(edge.itemId, port, true, a.y, min(a.x, b.x), max(a.x, b.x))
+                } else if (dx <= 0.5f && dy > 0.5f) {
+                    spans += Span(edge.itemId, port, false, a.x, min(a.y, b.y), max(a.y, b.y))
+                }
+            }
+        }
+        val grouped = spans.groupBy { span ->
+            Triple(span.horizontal, (span.fixed * 100f).toInt(), 0)
+        }
+        val pieces = mutableListOf<Piece>()
+        for (group in grouped.values) {
+            val cuts = group.flatMap { listOf(it.from, it.to) }.distinct().sorted()
+            val sample = group.first()
+            for (index in 0 until cuts.lastIndex) {
+                val from = cuts[index]
+                val to = cuts[index + 1]
+                if (to - from <= 0.5f) continue
+                val mid = (from + to) / 2f
+                val covering = group.filter { it.from < mid && it.to > mid }
+                if (covering.isEmpty()) continue
+                pieces += Piece(sample.horizontal, sample.fixed, from, to, covering)
+            }
+        }
+        return pieces
     }
 
     private fun port(

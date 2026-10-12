@@ -194,6 +194,28 @@ class GraphTest {
     }
 
     @Test
+    fun differentItemsOnOneSegmentAreKeptForAlternatingColor() {
+        val edges = listOf(
+            GraphEdge("a", "left", "right", "iron_ore"),
+            GraphEdge("b", "other", "sink", "copper_ore"),
+        )
+        val routes = listOf(
+            EdgeRoute("a", listOf(RoutePoint(0f, 10f), RoutePoint(100f, 10f))),
+            EdgeRoute("b", listOf(RoutePoint(40f, 10f), RoutePoint(80f, 10f))),
+        )
+        val shared = EdgeRouter.strokes(edges, routes).single { it.itemIds.size > 1 }
+        assertEquals(listOf("copper_ore", "iron_ore"), shared.itemIds)
+        assertTrue(shared.b.x - shared.a.x > 30f)
+    }
+
+    @Test
+    fun differentSourcePortsDoNotShareALine() {
+        assertPortsStayApart("motor", 10.0)
+        assertPortsStayApart("heavy_modular_frame", 1.0)
+        assertPortsStayApart("plastic", 20.0)
+    }
+
+    @Test
     fun routedEdgesMissForeignNodes() {
         assertRoutesClear("motor", 10.0)
         assertRoutesClear("heavy_modular_frame", 1.0)
@@ -215,6 +237,43 @@ class GraphTest {
         val platePort = GraphPorts.inputCenter(plate, "iron_plate", game, nodes, edges)
         assertEquals(plate.x, screwPort.first)
         assertTrue(screwPort.second < platePort.second)
+    }
+
+    private fun assertPortsStayApart(itemId: String, rate: Double) {
+        val targets = listOf(TargetRate(itemId, rate))
+        val solved = ProductionSolver(game).solve(targets)
+        val graph = GraphLayout.fromSolution(solved, targets, game)
+        val routes = EdgeRouter.paths(graph.nodes, graph.edges, game)
+        val overlaps = EdgeRouter.differentPortOverlaps(graph.edges, routes)
+        assertTrue(overlaps.isEmpty(), "$itemId: ${overlaps.joinToString()}")
+        if (itemId == "motor") {
+            val shared = EdgeRouter.strokes(graph.edges, routes).any { stroke ->
+                val users = graph.edges.filter { edge ->
+                    val route = routes.single { it.edgeId == edge.id }
+                    route.points.zipWithNext().any { (a, b) ->
+                        collinearPiece(a, b, stroke.a, stroke.b)
+                    }
+                }
+                users.map { it.fromNodeId to it.itemId }.distinct().size == 1 && users.size > 1
+            }
+            assertTrue(shared, "one iron output should keep a single shared trunk")
+        }
+    }
+
+    private fun collinearPiece(
+        a: de.fabrikplaner.core.graph.RoutePoint,
+        b: de.fabrikplaner.core.graph.RoutePoint,
+        c: de.fabrikplaner.core.graph.RoutePoint,
+        d: de.fabrikplaner.core.graph.RoutePoint,
+    ): Boolean {
+        val horizontal = abs(a.y - b.y) <= 0.5f && abs(c.y - d.y) <= 0.5f && abs(a.y - c.y) <= 0.5f
+        val vertical = abs(a.x - b.x) <= 0.5f && abs(c.x - d.x) <= 0.5f && abs(a.x - c.x) <= 0.5f
+        if (!horizontal && !vertical) return false
+        val a0 = if (horizontal) minOf(a.x, b.x) else minOf(a.y, b.y)
+        val a1 = if (horizontal) maxOf(a.x, b.x) else maxOf(a.y, b.y)
+        val c0 = if (horizontal) minOf(c.x, d.x) else minOf(c.y, d.y)
+        val c1 = if (horizontal) maxOf(c.x, d.x) else maxOf(c.y, d.y)
+        return minOf(a1, c1) - maxOf(a0, c0) > 1.5f
     }
 
     private fun assertRoutesClear(itemId: String, rate: Double) {
