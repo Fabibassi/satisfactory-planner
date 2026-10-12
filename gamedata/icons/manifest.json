@@ -1,0 +1,314 @@
+{
+  "source": "https://satisfactory.wiki.gg/",
+  "retrieved": "2026-10-12",
+  "note": "In-game item and building icons as published in the Satisfactory community wiki file repository. The artwork belongs to Coffee Stain Studios.",
+  "items": [
+    {
+      "id": "iron_ore",
+      "wikiFile": "Iron_Ore.png",
+      "bytes": 47808
+    },
+    {
+      "id": "copper_ore",
+      "wikiFile": "Copper_Ore.png",
+      "bytes": 52330
+    },
+    {
+      "id": "limestone",
+      "wikiFile": "Limestone.png",
+      "bytes": 38613
+    },
+    {
+      "id": "coal",
+      "wikiFile": "Coal.png",
+      "bytes": 37706
+    },
+    {
+      "id": "caterium_ore",
+      "wikiFile": "Caterium_Ore.png",
+      "bytes": 50609
+    },
+    {
+      "id": "raw_quartz",
+      "wikiFile": "Raw_Quartz.png",
+      "bytes": 57460
+    },
+    {
+      "id": "bauxite",
+      "wikiFile": "Bauxite.png",
+      "bytes": 45706
+    },
+    {
+      "id": "crude_oil",
+      "wikiFile": "Crude_Oil.png",
+      "bytes": 99086
+    },
+    {
+      "id": "water",
+      "wikiFile": "Water.png",
+      "bytes": 29935
+    },
+    {
+      "id": "iron_ingot",
+      "wikiFile": "Iron_Ingot.png",
+      "bytes": 25767
+    },
+    {
+      "id": "copper_ingot",
+      "wikiFile": "Copper_Ingot.png",
+      "bytes": 26507
+    },
+    {
+      "id": "caterium_ingot",
+      "wikiFile": "Caterium_Ingot.png",
+      "bytes": 32919
+    },
+    {
+      "id": "steel_ingot",
+      "wikiFile": "Steel_Ingot.png",
+      "bytes": 20318
+    },
+    {
+      "id": "aluminum_ingot",
+      "wikiFile": "Aluminum_Ingot.png",
+      "bytes": 32880
+    },
+    {
+      "id": "iron_plate",
+      "wikiFile": "Iron_Plate.png",
+      "bytes": 30621
+    },
+    {
+      "id": "iron_rod",
+      "wikiFile": "Iron_Rod.png",
+      "bytes": 27071
+    },
+    {
+      "id": "screw",
+      "wikiFile": "Screw.png",
+      "bytes": 40016
+    },
+    {
+      "id": "wire",
+      "wikiFile": "Wire.png",
+      "bytes": 43808
+    },
+    {
+      "id": "cable",
+      "wikiFile": "Cable.png",
+      "bytes": 44140
+    },
+    {
+      "id": "concrete",
+      "wikiFile": "Concrete.png",
+      "bytes": 39386
+    },
+    {
+      "id": "copper_sheet",
+      "wikiFile": "Copper_Sheet.png",
+      "bytes": 27128
+    },
+    {
+      "id": "quartz_crystal",
+      "wikiFile": "Quartz_Crystal.png",
+      "bytes": 38629
+    },
+    {
+      "id": "silica",
+      "wikiFile": "Silica.png",
+      "bytes": 30571
+    },
+    {
+      "id": "quickwire",
+      "wikiFile": "Quickwire.png",
+      "bytes": 41956
+    },
+    {
+      "id": "reinforced_iron_plate",
+      "wikiFile": "Reinforced_Iron_Plate.png",
+      "bytes": 29075
+    },
+    {
+      "id": "rotor",
+      "wikiFile": "Rotor.png",
+      "bytes": 43664
+    },
+    {
+      "id": "modular_frame",
+      "wikiFile": "Modular_Frame.png",
+      "bytes": 34845
+    },
+    {
+      "id": "steel_beam",
+      "wikiFile": "Steel_Beam.png",
+      "bytes": 28359
+    },
+    {
+      "id": "steel_pipe",
+      "wikiFile": "Steel_Pipe.png",
+      "bytes": 25966
+    },
+    {
+      "id": "encased_industrial_beam",
+      "wikiFile": "Encased_Industrial_Beam.png",
+      "bytes": 36671
+    },
+    {
+      "id": "stator",
+      "wikiFile": "Stator.png",
+      "bytes": 56443
+    },
+    {
+      "id": "motor",
+      "wikiFile": "Motor.png",
+      "bytes": 44077
+    },
+    {
+      "id": "smart_plating",
+      "wikiFile": "Smart_Plating.png",
+      "bytes": 40336
+    },
+    {
+      "id": "versatile_framework",
+      "wikiFile": "Versatile_Framework.png",
+      "bytes": 28377
+    },
+    {
+      "id": "heavy_modular_frame",
+      "wikiFile": "Heavy_Modular_Frame.png",
+      "bytes": 39264
+    },
+    {
+      "id": "plastic",
+      "wikiFile": "Plastic.png",
+      "bytes": 29458
+    },
+    {
+      "id": "rubber",
+      "wikiFile": "Rubber.png",
+      "bytes": 34884
+    },
+    {
+      "id": "heavy_oil_residue",
+      "wikiFile": "Heavy_Oil_Residue.png",
+      "bytes": 31055
+    },
+    {
+      "id": "fuel",
+      "wikiFile": "Fuel.png",
+      "bytes": 61574
+    },
+    {
+      "id": "polymer_resin",
+      "wikiFile": "Polymer_Resin.png",
+      "bytes": 46625
+    },
+    {
+      "id": "petroleum_coke",
+      "wikiFile": "Petroleum_Coke.png",
+      "bytes": 38290
+    },
+    {
+      "id": "empty_canister",
+      "wikiFile": "Empty_Canister.png",
+      "bytes": 42978
+    },
+    {
+      "id": "circuit_board",
+      "wikiFile": "Circuit_Board.png",
+      "bytes": 38255
+    },
+    {
+      "id": "computer",
+      "wikiFile": "Computer.png",
+      "bytes": 36768
+    },
+    {
+      "id": "ai_limiter",
+      "wikiFile": "AI_Limiter.png",
+      "bytes": 28508
+    },
+    {
+      "id": "high_speed_connector",
+      "wikiFile": "High-Speed_Connector.png",
+      "bytes": 26464
+    },
+    {
+      "id": "automated_wiring",
+      "wikiFile": "Automated_Wiring.png",
+      "bytes": 36534
+    },
+    {
+      "id": "alumina_solution",
+      "wikiFile": "Alumina_Solution.png",
+      "bytes": 28891
+    },
+    {
+      "id": "aluminum_scrap",
+      "wikiFile": "Aluminum_Scrap.png",
+      "bytes": 45145
+    },
+    {
+      "id": "aluminum_casing",
+      "wikiFile": "Aluminum_Casing.png",
+      "bytes": 27124
+    }
+  ],
+  "buildings": [
+    {
+      "id": "miner_mk1",
+      "wikiFile": "Miner_Mk.1.png",
+      "bytes": 87051
+    },
+    {
+      "id": "water_extractor",
+      "wikiFile": "Water_Extractor.png",
+      "bytes": 105484
+    },
+    {
+      "id": "oil_extractor",
+      "wikiFile": "Oil_Extractor.png",
+      "bytes": 87856
+    },
+    {
+      "id": "smelter",
+      "wikiFile": "Smelter.png",
+      "bytes": 118059
+    },
+    {
+      "id": "constructor",
+      "wikiFile": "Constructor.png",
+      "bytes": 115220
+    },
+    {
+      "id": "assembler",
+      "wikiFile": "Assembler.png",
+      "bytes": 134102
+    },
+    {
+      "id": "foundry",
+      "wikiFile": "Foundry.png",
+      "bytes": 131006
+    },
+    {
+      "id": "manufacturer",
+      "wikiFile": "Manufacturer.png",
+      "bytes": 120046
+    },
+    {
+      "id": "refinery",
+      "wikiFile": "Refinery.png",
+      "bytes": 66417
+    },
+    {
+      "id": "blender",
+      "wikiFile": "Blender.png",
+      "bytes": 119164
+    },
+    {
+      "id": "packager",
+      "wikiFile": "Packager.png",
+      "bytes": 101973
+    }
+  ]
+}

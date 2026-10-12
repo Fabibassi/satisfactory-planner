@@ -41,6 +41,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextMeasurer
@@ -55,8 +57,9 @@ import androidx.compose.ui.unit.sp
 import de.fabrikplaner.app.R
 import de.fabrikplaner.app.ui.formatNumber
 import de.fabrikplaner.app.ui.icon.BuildingGlyph
+import de.fabrikplaner.app.ui.icon.GameIcons
 import de.fabrikplaner.app.ui.icon.ItemGlyph
-import de.fabrikplaner.app.ui.icon.drawMonogram
+import de.fabrikplaner.app.ui.icon.drawItemArt
 import de.fabrikplaner.app.ui.icon.glyphColor
 import de.fabrikplaner.app.ui.icon.monogram
 import de.fabrikplaner.app.ui.localized
@@ -86,6 +89,7 @@ private data class EdgeDraw(
     val points: List<Offset>,
     val liquid: Boolean,
     val letters: String,
+    val icon: ImageBitmap?,
     val colorKey: String,
     val label: String,
     val circular: Boolean,
@@ -111,6 +115,7 @@ fun FactoryCanvas(
     modifier: Modifier = Modifier,
 ) {
     val densityScale = LocalDensity.current.density
+    val context = LocalContext.current
     val textMeasurer = rememberTextMeasurer()
     val nodesState = rememberUpdatedState(plan.nodes)
     val edgesState = rememberUpdatedState(plan.edges)
@@ -140,6 +145,7 @@ fun FactoryCanvas(
             points = routePoints[edge.id]?.takeIf { it.size >= 2 } ?: listOf(start, end),
             liquid = item?.form == ItemForm.LIQUID || item?.form == ItemForm.GAS,
             letters = monogram(name),
+            icon = GameIcons.item(context, edge.itemId),
             colorKey = edge.itemId,
             label = label,
             circular = item?.form == ItemForm.LIQUID || item?.form == ItemForm.GAS,
@@ -359,9 +365,10 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawEdgeLabel(
         size = Size(width, height),
         cornerRadius = CornerRadius(height / 2f, height / 2f),
     )
-    drawMonogram(
+    drawItemArt(
         topLeft = Offset(topLeft.x + pad, topLeft.y + (height - glyph) / 2f),
         sizePx = glyph,
+        image = edge.icon,
         letters = edge.letters,
         color = glyphColor(edge.colorKey),
         textMeasurer = textMeasurer,

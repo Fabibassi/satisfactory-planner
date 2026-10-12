@@ -3,6 +3,7 @@ package de.fabrikplaner.app.ui.plan
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,6 +29,8 @@ import androidx.compose.ui.window.DialogProperties
 import de.fabrikplaner.app.R
 import de.fabrikplaner.app.ui.currentLocale
 import de.fabrikplaner.app.ui.formatNumber
+import de.fabrikplaner.app.ui.icon.BuildingGlyph
+import de.fabrikplaner.app.ui.icon.ItemGlyph
 import de.fabrikplaner.app.ui.localized
 import de.fabrikplaner.core.data.GameData
 import de.fabrikplaner.core.solver.RateDelta
@@ -186,7 +189,10 @@ private fun RecipeSheetColumn(
         Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(heading, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             Text(recipeName, style = MaterialTheme.typography.titleSmall, maxLines = 3, overflow = TextOverflow.Ellipsis)
-            Text(buildingName, style = MaterialTheme.typography.bodySmall)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                BuildingGlyph(buildingName, sheet.buildingId, size = 28.dp)
+                Text(buildingName, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+            }
             Text(
                 stringResource(R.string.recipe_cycle) + ": " + stringResource(R.string.recipe_seconds, formatNumber(sheet.cycleSeconds, locale)),
                 style = MaterialTheme.typography.bodySmall,
@@ -200,21 +206,27 @@ private fun RecipeSheetColumn(
                 Text("–", style = MaterialTheme.typography.bodySmall)
             }
             sheet.inputs.forEach { flow ->
-                val name = game.itemOrNull(flow.itemId)?.localized(locale) ?: flow.itemId
-                Text(
-                    "$name  ${stringResource(R.string.per_min, formatNumber(flow.perMinute, locale))}",
-                    style = MaterialTheme.typography.bodySmall,
-                )
+                FlowLine(game, flow.itemId, stringResource(R.string.per_min, formatNumber(flow.perMinute, locale)))
             }
             Text(stringResource(R.string.recipe_outputs), style = MaterialTheme.typography.labelMedium)
             sheet.outputs.forEach { flow ->
-                val name = game.itemOrNull(flow.itemId)?.localized(locale) ?: flow.itemId
-                Text(
-                    "$name  ${stringResource(R.string.per_min, formatNumber(flow.perMinute, locale))}",
-                    style = MaterialTheme.typography.bodySmall,
-                )
+                FlowLine(game, flow.itemId, stringResource(R.string.per_min, formatNumber(flow.perMinute, locale)))
             }
         }
+    }
+}
+
+@Composable
+private fun FlowLine(game: GameData, itemId: String, rate: String) {
+    val locale = currentLocale()
+    val item = game.itemOrNull(itemId)
+    val name = item?.localized(locale) ?: itemId
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        ItemGlyph(name, itemId, item?.form, size = 22.dp)
+        Text("$name  $rate", style = MaterialTheme.typography.bodySmall)
     }
 }
 

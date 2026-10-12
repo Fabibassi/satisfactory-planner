@@ -54,6 +54,12 @@
     <string name="recipe_seconds">%1$s s</string>
     <string name="recipe_mw">%1$s MW</string>
     <string name="recipe_close">Close</string>
+    <string name="about_title">About</string>
+    <string name="about_cd">About</string>
+    <string name="about_fan">Unofficial fan project. Not affiliated with, endorsed, or supported by Coffee Stain Studios.</string>
+    <string name="about_assets">Satisfactory names, icons, and game graphics belong to Coffee Stain Studios.</string>
+    <string name="about_code">This app\'s own code: all rights reserved. © Fabian Baßiner. No license is granted.</string>
+    <string name="about_icons">Item and building icons come from the Satisfactory community wiki file repository at satisfactory.wiki.gg. If a graphic is missing, the app still shows an abbreviation.</string>
     <string name="cancel">Cancel</string>
     <string name="create">Create</string>
     <string name="back">Back</string>

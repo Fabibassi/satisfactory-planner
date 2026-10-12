@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,6 +51,7 @@ fun PlanListScreen(
     onExample: (String) -> Unit,
     onOpen: (String) -> Unit,
     onDelete: (String) -> Unit,
+    onAbout: () -> Unit,
 ) {
     val locale = currentLocale()
     var showCreate by rememberSaveable { mutableStateOf(false) }
@@ -57,7 +59,16 @@ fun PlanListScreen(
     val defaultName = stringResource(R.string.default_plan_name)
     val exampleName = stringResource(R.string.example_name)
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.plans_title)) }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.plans_title)) },
+                actions = {
+                    IconButton(onClick = onAbout) {
+                        Icon(Icons.Outlined.Info, contentDescription = stringResource(R.string.about_cd))
+                    }
+                },
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 name = defaultName

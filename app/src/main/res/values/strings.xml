@@ -54,6 +54,12 @@
     <string name="recipe_seconds">%1$s s</string>
     <string name="recipe_mw">%1$s MW</string>
     <string name="recipe_close">Schließen</string>
+    <string name="about_title">Info</string>
+    <string name="about_cd">Info</string>
+    <string name="about_fan">Inoffizielles Fan-Projekt. Nicht mit Coffee Stain Studios verbunden und nicht von Coffee Stain Studios unterstützt oder empfohlen.</string>
+    <string name="about_assets">Namen, Icons und Spielgrafiken von Satisfactory gehören Coffee Stain Studios.</string>
+    <string name="about_code">Der eigene Code dieser App: Alle Rechte vorbehalten. © Fabian Baßiner. Es wird keine Lizenz eingeräumt.</string>
+    <string name="about_icons">Gegenstands- und Gebäudeicons stammen aus dem Dateibestand des Community-Wikis satisfactory.wiki.gg. Fehlt eine Grafik, zeigt die App weiterhin ein Kürzel.</string>
     <string name="cancel">Abbrechen</string>
     <string name="create">Anlegen</string>
     <string name="back">Zurück</string>

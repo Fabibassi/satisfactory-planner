@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import de.fabrikplaner.app.PlannerViewModel
 import de.fabrikplaner.app.ui.editor.EditorScreen
+import de.fabrikplaner.app.ui.plan.AboutScreen
 import de.fabrikplaner.app.ui.plan.AlternateRecipeDialog
 import de.fabrikplaner.app.ui.plan.PlanListScreen
 import de.fabrikplaner.app.ui.plan.PlannerScreen
@@ -15,6 +16,7 @@ sealed interface Screen {
     data object Plans : Screen
     data class Planner(val id: String) : Screen
     data class Editor(val id: String) : Screen
+    data object About : Screen
 }
 
 @Composable
@@ -44,7 +46,9 @@ fun AppRoot(viewModel: PlannerViewModel) {
                 stack.add(Screen.Planner(id))
             },
             onDelete = viewModel::deletePlan,
+            onAbout = { stack.add(Screen.About) },
         )
+        Screen.About -> AboutScreen(onBack = { stack.removeAt(stack.lastIndex) })
         is Screen.Planner -> {
             LaunchedEffect(screen.id) { viewModel.open(screen.id) }
             PlannerScreen(

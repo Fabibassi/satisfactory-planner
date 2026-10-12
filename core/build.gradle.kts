@@ -25,4 +25,5 @@ tasks.test {
 
 sourceSets.named("main") {
     resources.srcDir("$rootDir/gamedata")
+    resources.exclude("icons/**")
 }

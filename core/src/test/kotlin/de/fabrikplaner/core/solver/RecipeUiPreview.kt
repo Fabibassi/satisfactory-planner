@@ -48,6 +48,8 @@ fun renderRecipeUi(out: File) {
     ) ?: error("cast screw comparison missing")
     drawList(File(out, "rezeptliste.png"), game, items, solved)
     drawComparison(File(out, "rezeptvergleich.png"), game, comparison)
+    drawNodeAndEdge(File(out, "knoten-rate.png"))
+    drawAbout(File(out, "info.png"))
 }
 
 private const val SCALE = 3f
@@ -139,13 +141,8 @@ private fun drawList(file: File, game: GameData, items: List<String>, solved: So
 private fun drawItemBlock(g: Graphics2D, game: GameData, solved: SolverResult, itemId: String, x: Int, y: Int, width: Int): Int {
     val item = game.item(itemId)
     var cursor = y
-    val glyph = dp(28)
-    roundFill(g, glyphColor(itemId), x, cursor, glyph, glyph, dp(7))
-    g.color = Color.WHITE
-    g.font = Font(Font.SANS_SERIF, Font.BOLD, ui(dp(4)))
-    val mono = monogram(item.name.de)
-    val fm = g.fontMetrics
-    g.drawString(mono, x + (glyph - fm.stringWidth(mono)) / 2, cursor + glyph / 2 + fm.ascent / 2 - dp(1))
+    val glyph = dp(36)
+    drawPng(g, "items/$itemId.png", x, cursor, glyph)
     g.color = OnSurface
     g.font = Font(Font.SANS_SERIF, Font.BOLD, ui(dp(5)))
     g.drawString(item.name.de, x + glyph + dp(8), cursor + dp(22))
@@ -160,14 +157,9 @@ private fun drawItemBlock(g: Graphics2D, game: GameData, solved: SolverResult, i
         val selected = recipe.id == active
         drawRadio(g, x + dp(4), rowTop + dp(10), selected)
         val building = game.buildingOrNull(recipe.buildingId)?.name?.de.orEmpty()
-        val bg = dp(22)
+        val bg = dp(28)
         val bx = x + dp(36)
-        roundFill(g, glyphColor("building:${recipe.buildingId}"), bx, rowTop + dp(8), bg, bg, dp(4))
-        g.color = Color.WHITE
-        g.font = Font(Font.SANS_SERIF, Font.BOLD, ui(dp(3)))
-        val letters = monogram(building)
-        val bfm = g.fontMetrics
-        g.drawString(letters, bx + (bg - bfm.stringWidth(letters)) / 2, rowTop + dp(8) + bg / 2 + bfm.ascent / 2 - dp(1))
+        drawPng(g, "buildings/${recipe.buildingId}.png", bx, rowTop + dp(6), bg)
         val badge = if (recipe.alternate) "Alternativ" else "Standard"
         val label = "${recipe.name.de} · $badge · $building"
         g.color = OnSurface
@@ -270,18 +262,38 @@ private fun paintSheet(g: Graphics2D, game: GameData, sheet: RecipeSheet, headin
     val recipeName = game.recipe(sheet.recipeId).name.de
     val building = game.building(sheet.buildingId).name.de
     cursor = text(g, recipeName, inner, cursor, innerW, Font.SANS_SERIF, dp(5), Font.BOLD, OnSurface)
-    cursor = text(g, building, inner, cursor, innerW, Font.SANS_SERIF, dp(4), Font.PLAIN, Muted)
+    cursor = iconLine(g, "buildings/${sheet.buildingId}.png", building, inner, cursor, innerW, dp(4), Font.PLAIN, Muted)
     cursor = text(g, "Taktzeit: ${formatNumber(sheet.cycleSeconds)} s", inner, cursor, innerW, Font.SANS_SERIF, dp(4), Font.PLAIN, OnSurface)
     cursor = text(g, "Leistung je Maschine: ${formatNumber(sheet.powerMw)} MW", inner, cursor, innerW, Font.SANS_SERIF, dp(4), Font.PLAIN, OnSurface)
     cursor = text(g, "Eingänge", inner, cursor, innerW, Font.SANS_SERIF, dp(4), Font.BOLD, OnSurface)
     for (flow in sheet.inputs) {
         val name = game.item(flow.itemId).name.de
-        cursor = text(g, "$name  ${formatNumber(flow.perMinute)} / min", inner, cursor, innerW, Font.SANS_SERIF, dp(4), Font.PLAIN, OnSurface)
+        cursor = iconLine(
+            g,
+            "items/${flow.itemId}.png",
+            "$name  ${formatNumber(flow.perMinute)} / min",
+            inner,
+            cursor,
+            innerW,
+            dp(4),
+            Font.PLAIN,
+            OnSurface,
+        )
     }
     cursor = text(g, "Ausgänge", inner, cursor, innerW, Font.SANS_SERIF, dp(4), Font.BOLD, OnSurface)
     for (flow in sheet.outputs) {
         val name = game.item(flow.itemId).name.de
-        cursor = text(g, "$name  ${formatNumber(flow.perMinute)} / min", inner, cursor, innerW, Font.SANS_SERIF, dp(4), Font.PLAIN, OnSurface)
+        cursor = iconLine(
+            g,
+            "items/${flow.itemId}.png",
+            "$name  ${formatNumber(flow.perMinute)} / min",
+            inner,
+            cursor,
+            innerW,
+            dp(4),
+            Font.PLAIN,
+            OnSurface,
+        )
     }
     return y + bottom
 }
@@ -297,7 +309,7 @@ private fun sheetHeight(g: Graphics2D, game: GameData, sheet: RecipeSheet, width
     h += lineHeight(g, "Eisenstange  10 / min", dp(4), Font.PLAIN, innerW) * sheet.inputs.size.coerceAtLeast(1)
     h += lineHeight(g, "Ausgänge", dp(4), Font.BOLD, innerW)
     h += lineHeight(g, "Schraube  40 / min", dp(4), Font.PLAIN, innerW) * sheet.outputs.size
-    return h + dp(28)
+    return h + dp(28) + dp(16) * (1 + sheet.inputs.size + sheet.outputs.size)
 }
 
 private fun deltaBlock(g: Graphics2D, label: String, value: String, delta: RateDelta, x: Int, y: Int, width: Int): Int {
@@ -330,6 +342,126 @@ private fun formatNumber(value: Double): String {
     format.minimumFractionDigits = 0
     format.maximumFractionDigits = 2
     return format.format(value)
+}
+
+private fun iconLine(
+    g: Graphics2D,
+    png: String,
+    label: String,
+    x: Int,
+    y: Int,
+    width: Int,
+    size: Int,
+    style: Int,
+    color: Color,
+): Int {
+    val box = dp(22)
+    drawPng(g, png, x, y, box)
+    val next = text(g, label, x + box + dp(4), y, width - box - dp(4), Font.SANS_SERIF, size, style, color)
+    return maxOf(next, y + box + dp(4))
+}
+
+private val pngCache = HashMap<String, BufferedImage?>()
+
+private fun drawPng(g: Graphics2D, relative: String, x: Int, y: Int, size: Int) {
+    val image = pngCache.getOrPut(relative) {
+        val file = repoFile("gamedata/icons/$relative")
+        if (!file.isFile) null else ImageIO.read(file)
+    }
+    if (image != null) {
+        g.drawImage(image, x, y, size, size, null)
+    }
+}
+
+private fun repoFile(relative: String): File {
+    var dir: File? = File(System.getProperty("user.dir"))
+    for (step in 0 until 4) {
+        val current = dir ?: break
+        val candidate = File(current, relative)
+        if (candidate.exists()) return candidate
+        dir = current.parentFile
+    }
+    return File(relative)
+}
+
+private fun drawNodeAndEdge(file: File) {
+    val image = BufferedImage(1080, 720, BufferedImage.TYPE_INT_RGB)
+    val g = image.createGraphics()
+    prepare(g)
+    g.color = Color(0xFF101316.toInt())
+    g.fillRect(0, 0, image.width, image.height)
+    roundFill(g, SurfaceVariant, 80, 80, 520, 280, 36)
+    drawPng(g, "items/motor.png", 110, 110, 96)
+    g.color = OnSurface
+    g.font = Font(Font.SANS_SERIF, Font.BOLD, 42)
+    g.drawString("Motor", 230, 160)
+    drawPng(g, "buildings/assembler.png", 230, 186, 48)
+    g.font = Font(Font.SANS_SERIF, Font.PLAIN, 32)
+    g.drawString("Montierer × 2,00", 290, 222)
+    g.color = Primary
+    g.stroke = BasicStroke(8f)
+    g.drawLine(600, 220, 860, 220)
+    g.drawLine(860, 220, 860, 420)
+    roundFill(g, Color(0xF0101316.toInt(), true), 700, 300, 280, 72, 36)
+    drawPng(g, "items/iron_rod.png", 716, 312, 48)
+    g.color = Color.WHITE
+    g.font = Font(Font.SANS_SERIF, Font.BOLD, 32)
+    g.drawString("15 / min", 776, 348)
+    g.color = Muted
+    g.font = Font(Font.SANS_SERIF, Font.PLAIN, 28)
+    g.drawString("Knoten und Kantenrate", 80, 640)
+    g.dispose()
+    ImageIO.write(image, "png", file)
+}
+
+private fun drawAbout(file: File) {
+    val image = BufferedImage(1080, 1400, BufferedImage.TYPE_INT_RGB)
+    val g = image.createGraphics()
+    prepare(g)
+    g.color = Scrim
+    g.fillRect(0, 0, image.width, image.height)
+    g.color = OnSurface
+    var y = text(g, "Info", 48, 48, 980, Font.SANS_SERIF, dp(8), Font.BOLD, OnSurface)
+    y += dp(8)
+    y = text(g, "Fabrikplaner", 48, y, 980, Font.SANS_SERIF, dp(6), Font.BOLD, OnSurface)
+    y += dp(8)
+    y = text(
+        g,
+        "Inoffizielles Fan-Projekt. Nicht mit Coffee Stain Studios verbunden und nicht von Coffee Stain Studios unterstützt oder empfohlen.",
+        48,
+        y,
+        980,
+        Font.SANS_SERIF,
+        dp(5),
+        Font.PLAIN,
+        OnSurface,
+    )
+    y += dp(8)
+    y = text(
+        g,
+        "Namen, Icons und Spielgrafiken von Satisfactory gehören Coffee Stain Studios.",
+        48,
+        y,
+        980,
+        Font.SANS_SERIF,
+        dp(5),
+        Font.PLAIN,
+        OnSurface,
+    )
+    y += dp(8)
+    text(
+        g,
+        "Der eigene Code dieser App: Alle Rechte vorbehalten. © Fabian Baßiner. Es wird keine Lizenz eingeräumt.",
+        48,
+        y,
+        980,
+        Font.SANS_SERIF,
+        dp(5),
+        Font.PLAIN,
+        OnSurface,
+    )
+    g.dispose()
+    ImageIO.write(image, "png", file)
 }
 
 private fun drawRadio(g: Graphics2D, x: Int, y: Int, selected: Boolean) {

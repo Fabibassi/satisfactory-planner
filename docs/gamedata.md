@@ -19,9 +19,13 @@ Deutsche Anzeigenamen sind die üblichen Bezeichnungen aus der deutschen Spielve
 
 ## Icons
 
-Die App zeichnet eigene Kürzel-Marken (zwei Buchstaben, Farbe aus der Kategorie). Offizielle Satisfactory-Icons werden nicht mitgeliefert. Die Grafiken aus dem Spiel und von satisfactory.wiki.gg gehören Coffee Stain Studios; es gibt keine Lizenz, die das Bündeln dieser Dateien in einer Fan-App erlaubt. Sobald eine ausdrückliche Freigabe vorliegt, können die Marken durch die Spielegrafiken ersetzt werden.
+Gegenstands- und Gebäudeicons liegen unter `gamedata/icons/items/<id>.png` und `gamedata/icons/buildings/<id>.png`. Die Zuordnung und die Wiki-Dateinamen stehen in `gamedata/icons/manifest.json`.
 
-Satisfactory ist eine Marke von Coffee Stain Studios. Dieses Projekt ist ein inoffizielles Fan-Tool.
+Herkunft: Dateibestand des Community-Wikis [satisfactory.wiki.gg](https://satisfactory.wiki.gg/) (Abruf 12. Oktober 2026, `tools/fetch_icons.py`). Das Wiki veröffentlicht die Grafiken aus dem Spiel unter den englischen Gegenstandsnamen (`Special:FilePath`, zum Beispiel `Iron_Ingot.png`, `Constructor.png`). Es ist dieselbe Bildquelle, die Community-Werkzeuge wie das Wiki selbst und darauf aufbauende Rechner verwenden. Die Dateien sind Spielgrafiken von Coffee Stain Studios, kein eigenes Artwork dieser App.
+
+Fehlt eine Datei oder lässt sie sich nicht lesen, zeichnet die Oberfläche weiter das zweibuchstabige Kürzel.
+
+Satisfactory ist eine Marke von Coffee Stain Studios. Dieses Projekt ist ein inoffizielles Fan-Tool und steht in keiner Verbindung zu Coffee Stain Studios.
 
 ## Aktualisieren
 

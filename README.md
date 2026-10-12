@@ -9,7 +9,9 @@ Zwei Modi teilen sich denselben Plan:
 
 Pläne liegen als JSON unter dem App-Dateiverzeichnis und überstehen einen Neustart.
 
-Die Oberfläche ist Deutsch. Ist die Gerätesprache Englisch, kommen die Texte aus `values-en`. Gegenstandsnamen folgen derselben Regel.
+Die Oberfläche ist Deutsch. Ist die Gerätesprache Englisch, kommen die Texte aus `values-en`. Gegenstandsnamen folgen derselben Regel. Knoten, Rezeptlisten, der Rezeptvergleich und die Raten an den Kanten zeigen die Gegenstands- und Gebäudeicons aus dem Community-Wiki. Fehlt eine Datei, bleibt das zweibuchstabige Kürzel.
+
+Inoffizielles Fan-Projekt. Nicht mit Coffee Stain Studios verbunden und nicht von Coffee Stain Studios unterstützt oder empfohlen. Namen, Icons und Spielgrafiken von Satisfactory gehören Coffee Stain Studios. Der eigene Code dieser App: Alle Rechte vorbehalten. © Fabian Baßiner. Es wird keine Lizenz eingeräumt.
 
 ## Bauen und installieren
 
@@ -65,6 +67,10 @@ Siehe [docs/gamedata.md](docs/gamedata.md). Kurz: `tools/build_game_data.py` erz
 - Übertaktung, Shards und Somersloops auch in der automatischen Berechnung.
 - Besseres Layout, Kopieren, Gruppen und Blaupausen.
 - Ziel „minimiere Rohstoffe“ oder „minimiere Leistung“ über die Alternativen.
-- Offizielle Gegenstands-Icons, sobald Coffee Stain das Bündeln freigibt. Bis dahin zeigt die App eigene Kürzel.
+## Rechtliches
 
-Inoffizielles Fan-Tool. Satisfactory ist eine Marke von Coffee Stain Studios.
+Inoffizielles Fan-Projekt. Nicht mit Coffee Stain Studios verbunden und nicht von Coffee Stain Studios unterstützt oder empfohlen.
+
+Namen, Icons und Spielgrafiken von Satisfactory gehören Coffee Stain Studios. Die gebündelten Icons stammen aus dem Dateibestand des Community-Wikis [satisfactory.wiki.gg](https://satisfactory.wiki.gg/) (siehe [docs/gamedata.md](docs/gamedata.md)).
+
+Der eigene Code dieser App: Alle Rechte vorbehalten. © Fabian Baßiner. Es wird keine Lizenz eingeräumt.
