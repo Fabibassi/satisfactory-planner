@@ -38,6 +38,8 @@ import de.fabrikplaner.app.PlannerViewModel
 import de.fabrikplaner.app.R
 import de.fabrikplaner.app.ui.currentLocale
 import de.fabrikplaner.app.ui.formatNumber
+import de.fabrikplaner.app.ui.icon.BuildingGlyph
+import de.fabrikplaner.app.ui.icon.ItemGlyph
 import de.fabrikplaner.app.ui.localized
 import de.fabrikplaner.app.ui.machinesToPlace
 import de.fabrikplaner.app.ui.parsePositive
@@ -98,8 +100,11 @@ fun PlannerScreen(
             }
             plan.targets.forEach { target ->
                 key(target.itemId) {
+                    val item = viewModel.game.itemOrNull(target.itemId)
                     TargetRateRow(
-                        label = viewModel.game.itemOrNull(target.itemId)?.localized(locale) ?: target.itemId,
+                        label = item?.localized(locale) ?: target.itemId,
+                        itemKey = target.itemId,
+                        form = item?.form,
                         rate = target.perMinute,
                         onRate = { viewModel.updateTargetRate(target.itemId, it) },
                         onDelete = { viewModel.removeTarget(target.itemId) },
@@ -118,6 +123,11 @@ fun PlannerScreen(
                     enabled = result != null && plan.targets.isNotEmpty(),
                 ) {
                     Text(stringResource(R.string.regenerate_graph))
+                }
+            }
+            if (viewModel.choiceItemIds(result).isNotEmpty()) {
+                OutlinedButton(onClick = viewModel::openRecipePrompt) {
+                    Text(stringResource(R.string.recipe_prompt_button))
                 }
             }
             if (plan.graphIsStale()) {
@@ -223,6 +233,8 @@ fun PlannerScreen(
 @Composable
 private fun TargetRateRow(
     label: String,
+    itemKey: String,
+    form: de.fabrikplaner.core.model.ItemForm?,
     rate: Double,
     onRate: (Double) -> Unit,
     onDelete: () -> Unit,
@@ -230,6 +242,7 @@ private fun TargetRateRow(
     val locale = currentLocale()
     var rateText by rememberSaveable(label) { mutableStateOf(formatNumber(rate, locale)) }
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        ItemGlyph(label, itemKey, form, size = 32.dp)
         Text(label, modifier = Modifier.weight(1f))
         OutlinedTextField(
             value = rateText,
@@ -261,8 +274,16 @@ private fun MachineRow(usage: MachineUsage, viewModel: PlannerViewModel, english
         val recipe = viewModel.game.recipe(id)
         if (english) recipe.name.en else recipe.name.de
     }
-    val title = recipeName ?: usage.outputs.firstOrNull()?.let { viewModel.game.item(it.itemId).localized(locale) } ?: buildingName
-    Column(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+    val output = usage.outputs.firstOrNull()?.let { viewModel.game.item(it.itemId) }
+    val title = recipeName ?: output?.localized(locale) ?: buildingName
+    Row(
+        Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        ItemGlyph(output?.localized(locale) ?: title, output?.id ?: usage.buildingId, output?.form)
+        BuildingGlyph(buildingName, usage.buildingId)
+        Column(Modifier.weight(1f)) {
         Text(title, style = MaterialTheme.typography.titleSmall)
         Text(
             stringResource(
@@ -273,6 +294,7 @@ private fun MachineRow(usage: MachineUsage, viewModel: PlannerViewModel, english
         )
         Text(stringResource(R.string.rounded_hint, machinesToPlace(usage.machineCount)))
         Text(stringResource(R.string.power_mw, formatNumber(usage.powerMw, locale, 1)))
+        }
     }
 }
 

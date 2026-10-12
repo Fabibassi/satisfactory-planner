@@ -32,6 +32,14 @@
     <string name="alternate_badge">Alternativ</string>
     <string name="standard_badge">Standard</string>
     <string name="choose_recipe">Rezept wählen</string>
+    <string name="recipe_prompt_title">Rezepte für die Kette</string>
+    <string name="recipe_prompt_body">Diese Teile haben Alternativen. Die Auswahl gilt für die ganze Produktionskette, danach wird der Graph neu aufgebaut.</string>
+    <string name="recipe_prompt_none">Mit der aktuellen Auswahl gibt es keine weiteren Alternativen.</string>
+    <string name="recipe_prompt_button">Alternativrezepte</string>
+    <string name="recipe_apply">Übernehmen und Graph bauen</string>
+    <string name="recipe_use_defaults">Standardrezepte</string>
+    <string name="change_recipe">Rezept ändern</string>
+    <string name="change_recipe_note">Wechselt das Rezept und baut die Kette neu auf.</string>
     <string name="cancel">Abbrechen</string>
     <string name="create">Anlegen</string>
     <string name="back">Zurück</string>

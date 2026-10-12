@@ -33,6 +33,8 @@ class PlannerViewModel(
         private set
     var balance by mutableStateOf<BalanceReport?>(null)
         private set
+    var recipePrompt by mutableStateOf(false)
+        private set
 
     init {
         refresh()
@@ -65,15 +67,68 @@ class PlannerViewModel(
     }
 
     fun createExample(name: String): String {
-        current = SavedPlan(
+        val plan = SavedPlan(
             id = UUID.randomUUID().toString(),
             name = name,
             targets = listOf(TargetRate("motor", 10.0)),
             updatedAtEpochMs = System.currentTimeMillis(),
         )
+        current = plan
         recalculate()
-        generateGraph()
-        return current?.id ?: ""
+        repository.save(plan)
+        refresh()
+        recipePrompt = choiceItemIds(result).isNotEmpty()
+        return plan.id
+    }
+
+    fun openRecipePrompt() {
+        recipePrompt = true
+    }
+
+    fun dismissRecipePrompt() {
+        recipePrompt = false
+    }
+
+    fun preview(selection: Map<String, String>): SolverResult =
+        solver.solve(current?.targets.orEmpty(), selection)
+
+    fun choiceItemIds(solved: SolverResult?): List<String> {
+        if (solved == null) return emptyList()
+        return solved.machines.mapNotNull { machine ->
+            val recipe = machine.recipeId?.let { game.recipeOrNull(it) } ?: return@mapNotNull null
+            val itemId = recipe.outputs.firstOrNull()?.itemId ?: return@mapNotNull null
+            if (game.recipesProducing(itemId).size > 1) itemId else null
+        }.distinct()
+    }
+
+    fun confirmRecipes(selection: Map<String, String>, rebuildGraph: Boolean) {
+        edit { it.copy(recipeSelection = selection) }
+        recalculate()
+        recipePrompt = false
+        if (rebuildGraph) generateGraph()
+    }
+
+    fun changeNodeRecipe(itemId: String, recipeId: String) {
+        val plan = current ?: return
+        if (plan.targets.isEmpty()) {
+            edit(rebalance = true) { currentPlan ->
+                currentPlan.copy(
+                    recipeSelection = currentPlan.recipeSelection + (itemId to recipeId),
+                    nodes = currentPlan.nodes.map { node ->
+                        val primary = node.recipeId?.let { game.recipeOrNull(it) }?.outputs?.firstOrNull()?.itemId
+                        if (primary == itemId) {
+                            val next = game.recipe(recipeId)
+                            node.copy(recipeId = next.id, buildingId = next.buildingId)
+                        } else {
+                            node
+                        }
+                    },
+                )
+            }
+            recalculate()
+        } else {
+            confirmRecipes(plan.recipeSelection + (itemId to recipeId), rebuildGraph = true)
+        }
     }
 
     fun deletePlan(id: String) {

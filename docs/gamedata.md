@@ -15,7 +15,11 @@ Berücksichtigt sind die Rezeptänderungen von Patch 1.0, unter anderem:
 
 Gebäudeleistungen bei 100 % Takt: Miner Mk.1 5 MW, Wasserpumpe 20 MW, Ölförderer 40 MW, Schmelze 4 MW, Konstruktor 4 MW, Montierer 15 MW, Gießerei 16 MW, Manufaktor 55 MW, Raffinerie 30 MW, Mischer 75 MW, Verpacker 10 MW. Förderung fester Rohstoffe rechnet mit Miner Mk.1 bei normaler Reinheit (60/min), Öl und Wasser mit 120/min.
 
-Deutsche Anzeigenamen sind die üblichen Bezeichnungen aus der deutschen Spielversion. Es werden keine Spielegrafiken mitgeliefert.
+Deutsche Anzeigenamen sind die üblichen Bezeichnungen aus der deutschen Spielversion.
+
+## Icons
+
+Die App zeichnet eigene Kürzel-Marken (zwei Buchstaben, Farbe aus der Kategorie). Offizielle Satisfactory-Icons werden nicht mitgeliefert. Die Grafiken aus dem Spiel und von satisfactory.wiki.gg gehören Coffee Stain Studios; es gibt keine Lizenz, die das Bündeln dieser Dateien in einer Fan-App erlaubt. Sobald eine ausdrückliche Freigabe vorliegt, können die Marken durch die Spielegrafiken ersetzt werden.
 
 Satisfactory ist eine Marke von Coffee Stain Studios. Dieses Projekt ist ein inoffizielles Fan-Tool.
 

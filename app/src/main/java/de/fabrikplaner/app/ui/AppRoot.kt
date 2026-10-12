@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import de.fabrikplaner.app.PlannerViewModel
 import de.fabrikplaner.app.ui.editor.EditorScreen
+import de.fabrikplaner.app.ui.plan.AlternateRecipeDialog
 import de.fabrikplaner.app.ui.plan.PlanListScreen
 import de.fabrikplaner.app.ui.plan.PlannerScreen
 
@@ -33,7 +34,10 @@ fun AppRoot(viewModel: PlannerViewModel) {
             onExample = { name ->
                 val id = viewModel.createExample(name)
                 stack.add(Screen.Planner(id))
-                stack.add(Screen.Editor(id))
+                if (!viewModel.recipePrompt) {
+                    viewModel.generateGraph()
+                    stack.add(Screen.Editor(id))
+                }
             },
             onOpen = { id ->
                 viewModel.open(id)
@@ -47,10 +51,16 @@ fun AppRoot(viewModel: PlannerViewModel) {
                 viewModel = viewModel,
                 onBack = { stack.removeAt(stack.lastIndex) },
                 onOpenEditor = {
-                    if (viewModel.current?.nodes.isNullOrEmpty() && viewModel.result?.machines?.isNotEmpty() == true) {
-                        viewModel.generateGraph()
+                    val empty = viewModel.current?.nodes.isNullOrEmpty()
+                    val choices = viewModel.choiceItemIds(viewModel.result)
+                    if (empty && choices.isNotEmpty()) {
+                        viewModel.openRecipePrompt()
+                    } else {
+                        if (empty && viewModel.result?.machines?.isNotEmpty() == true) {
+                            viewModel.generateGraph()
+                        }
+                        stack.add(Screen.Editor(screen.id))
                     }
-                    stack.add(Screen.Editor(screen.id))
                 },
             )
         }
@@ -68,5 +78,22 @@ fun AppRoot(viewModel: PlannerViewModel) {
                 },
             )
         }
+    }
+    if (viewModel.recipePrompt) {
+        AlternateRecipeDialog(
+            game = viewModel.game,
+            initialSelection = viewModel.current?.recipeSelection.orEmpty(),
+            solve = viewModel::preview,
+            choiceItems = viewModel::choiceItemIds,
+            onDismiss = viewModel::dismissRecipePrompt,
+            onApply = { selection ->
+                val openEditor = stack.last() is Screen.Planner
+                val plannerId = (stack.last() as? Screen.Planner)?.id
+                viewModel.confirmRecipes(selection, rebuildGraph = true)
+                if (openEditor && plannerId != null && stack.last() is Screen.Planner) {
+                    stack.add(Screen.Editor(plannerId))
+                }
+            },
+        )
     }
 }

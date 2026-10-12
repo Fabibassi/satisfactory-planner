@@ -32,6 +32,14 @@
     <string name="alternate_badge">Alternate</string>
     <string name="standard_badge">Standard</string>
     <string name="choose_recipe">Choose recipe</string>
+    <string name="recipe_prompt_title">Recipes for this chain</string>
+    <string name="recipe_prompt_body">These parts have alternates. The choice applies to the whole production chain, then the graph is rebuilt.</string>
+    <string name="recipe_prompt_none">The current selection has no further alternates.</string>
+    <string name="recipe_prompt_button">Alternate recipes</string>
+    <string name="recipe_apply">Apply and build graph</string>
+    <string name="recipe_use_defaults">Standard recipes</string>
+    <string name="change_recipe">Change recipe</string>
+    <string name="change_recipe_note">Switches the recipe and rebuilds the chain.</string>
     <string name="cancel">Cancel</string>
     <string name="create">Create</string>
     <string name="back">Back</string>

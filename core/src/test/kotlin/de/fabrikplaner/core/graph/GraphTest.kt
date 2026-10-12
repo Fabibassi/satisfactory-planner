@@ -141,6 +141,85 @@ class GraphTest {
         val node = recipe("n", "iron_ingot", 1.0, 10f)
         val port = GraphMetrics.outputPort(node, 0, 1)
         assertEquals(node.x + GraphMetrics.CARD_W, port.first)
+        assertEquals(node.y + GraphMetrics.portY(0, 1), port.second)
+        val input = GraphMetrics.inputPort(node, 0, 1)
+        assertEquals(node.x, input.first)
+        assertTrue(port.second > node.y)
+        assertTrue(port.second < node.y + GraphMetrics.CARD_H)
+    }
+
+    @Test
+    fun barycenterRemovesTheCrossing() {
+        val nodes = listOf(
+            GraphNode("A", NodeKind.SOURCE, 0f, 0f, itemId = "iron_ore"),
+            GraphNode("B", NodeKind.SOURCE, 0f, 0f, itemId = "copper_ore"),
+            GraphNode("C", NodeKind.SINK, 0f, 0f, itemId = "copper_ore"),
+            GraphNode("D", NodeKind.SINK, 0f, 0f, itemId = "iron_ore"),
+        )
+        val edges = listOf(
+            GraphEdge("e1", "A", "D", "iron_ore"),
+            GraphEdge("e2", "B", "C", "copper_ore"),
+        )
+        val placed = GraphLayout.arrange(nodes, edges)
+        assertEquals(0, GraphLayout.straightCrossings(placed, edges))
+        val byId = placed.associateBy { it.id }
+        assertTrue(byId.getValue("A").x < byId.getValue("D").x)
+        assertTrue(byId.getValue("D").y < byId.getValue("C").y)
+    }
+
+    @Test
+    fun motorChainFlowsLeftToRightWithFewerCrossingsThanIdOrder() {
+        val targets = listOf(TargetRate("motor", 10.0))
+        val solved = ProductionSolver(game).solve(targets)
+        val graph = GraphLayout.fromSolution(solved, targets, game)
+        val byId = graph.nodes.associateBy { it.id }
+        for (edge in graph.edges) {
+            assertTrue(
+                byId.getValue(edge.fromNodeId).x < byId.getValue(edge.toNodeId).x,
+                "${edge.fromNodeId} -> ${edge.toNodeId}",
+            )
+        }
+        val sugiyama = GraphLayout.straightCrossings(graph.nodes, graph.edges)
+        val idOrdered = idOrderWithinLayers(graph.nodes)
+        val alphabetical = GraphLayout.straightCrossings(idOrdered, graph.edges)
+        assertTrue(sugiyama <= alphabetical, "sugiyama=$sugiyama alphabetical=$alphabetical")
+        assertTrue(sugiyama <= 4, "crossings=$sugiyama")
+        val sameLayer = graph.nodes.groupBy { it.x }
+        for (column in sameLayer.values) {
+            val sorted = column.sortedBy { it.y }
+            for (index in 1 until sorted.size) {
+                assertTrue(sorted[index].y >= sorted[index - 1].y + GraphMetrics.CARD_H - 0.1f)
+            }
+        }
+    }
+
+    @Test
+    fun portsPointAtTheConnectedNeighbor() {
+        val plate = recipe("rip", "reinforced_iron_plate", 1.0, 400f).copy(y = 100f)
+        val screws = recipe("scr", "screw", 1.0, 0f).copy(y = 0f)
+        val plates = recipe("plt", "iron_plate", 1.0, 0f).copy(y = 300f)
+        val nodes = listOf(plate, screws, plates)
+        val edges = listOf(
+            GraphEdge("e1", "scr", "rip", "screw"),
+            GraphEdge("e2", "plt", "rip", "iron_plate"),
+        )
+        assertEquals(listOf("screw", "iron_plate"), GraphPorts.orderedInputs(plate, game, nodes, edges))
+        val screwPort = GraphPorts.inputCenter(plate, "screw", game, nodes, edges)
+        val platePort = GraphPorts.inputCenter(plate, "iron_plate", game, nodes, edges)
+        assertEquals(plate.x, screwPort.first)
+        assertTrue(screwPort.second < platePort.second)
+    }
+
+    private fun idOrderWithinLayers(nodes: List<GraphNode>): List<GraphNode> {
+        val layers = nodes.groupBy { it.x }.toSortedMap()
+        val placed = mutableListOf<GraphNode>()
+        for ((x, column) in layers) {
+            column.sortedBy { it.id }.forEachIndexed { index, node ->
+                val y = GraphMetrics.ORIGIN + index * (GraphMetrics.CARD_H + GraphMetrics.GAP_Y)
+                placed += node.copy(x = x, y = y)
+            }
+        }
+        return placed
     }
 
     private fun source(id: String, itemId: String, rate: Double, x: Float) =

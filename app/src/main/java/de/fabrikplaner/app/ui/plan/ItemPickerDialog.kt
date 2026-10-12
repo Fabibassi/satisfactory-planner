@@ -2,6 +2,7 @@ package de.fabrikplaner.app.ui.plan
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -23,6 +24,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import de.fabrikplaner.app.R
 import de.fabrikplaner.app.ui.currentLocale
+import de.fabrikplaner.app.ui.icon.BuildingGlyph
+import de.fabrikplaner.app.ui.icon.ItemGlyph
 import de.fabrikplaner.app.ui.localized
 import de.fabrikplaner.app.ui.parsePositive
 import de.fabrikplaner.core.data.GameData
@@ -80,7 +83,8 @@ fun ItemPickerDialog(
                                 modifier = Modifier.padding(vertical = 6.dp),
                             )
                             group.forEach { item ->
-                                PickerRow(item.localized(locale)) {
+                                val name = item.localized(locale)
+                                PickerRow(name, { ItemGlyph(name, item.id, item.form, size = 32.dp) }) {
                                     val rate = if (showRate) parsePositive(rateText) ?: return@PickerRow else 0.0
                                     onPick(item.id, rate)
                                 }
@@ -88,7 +92,8 @@ fun ItemPickerDialog(
                         }
                     }
                     filtered.filter { it.category !in categoryOrder }.sortedBy { it.localized(locale) }.forEach { item ->
-                        PickerRow(item.localized(locale)) {
+                        val name = item.localized(locale)
+                        PickerRow(name, { ItemGlyph(name, item.id, item.form, size = 32.dp) }) {
                             val rate = if (showRate) parsePositive(rateText) ?: return@PickerRow else 0.0
                             onPick(item.id, rate)
                         }
@@ -123,7 +128,16 @@ fun RecipePickerDialog(
                         stringResource(R.string.standard_badge)
                     }
                     val building = game.buildingOrNull(recipe.buildingId)?.name?.localized(locale).orEmpty()
-                    PickerRow("${recipe.name.localized(locale)} · $badge · $building") {
+                    val recipeName = recipe.name.localized(locale)
+                    PickerRow(
+                        "$recipeName · $badge · $building",
+                        {
+                            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                                ItemGlyph(item?.localized(locale) ?: recipeName, itemId, item?.form, size = 28.dp)
+                                BuildingGlyph(building, recipe.buildingId, modifier = Modifier.padding(start = 4.dp), size = 22.dp)
+                            }
+                        },
+                    ) {
                         onPick(recipe.id)
                     }
                 }
@@ -135,9 +149,10 @@ fun RecipePickerDialog(
 }
 
 @Composable
-private fun PickerRow(label: String, onClick: () -> Unit) {
+private fun PickerRow(label: String, icon: (@Composable () -> Unit)? = null, onClick: () -> Unit) {
     ListItem(
         headlineContent = { Text(label) },
+        leadingContent = icon,
         modifier = Modifier.clickable(onClick = onClick).fillMaxWidth(),
     )
 }

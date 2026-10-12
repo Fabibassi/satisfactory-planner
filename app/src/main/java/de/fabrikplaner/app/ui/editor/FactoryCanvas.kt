@@ -5,10 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -23,12 +24,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -38,11 +42,23 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import de.fabrikplaner.app.R
+import de.fabrikplaner.app.ui.formatNumber
+import de.fabrikplaner.app.ui.icon.BuildingGlyph
+import de.fabrikplaner.app.ui.icon.ItemGlyph
+import de.fabrikplaner.app.ui.icon.drawMonogram
+import de.fabrikplaner.app.ui.icon.glyphColor
+import de.fabrikplaner.app.ui.icon.monogram
+import de.fabrikplaner.app.ui.localized
 import de.fabrikplaner.app.ui.theme.BeltSolid
 import de.fabrikplaner.app.ui.theme.PipeLiquid
 import de.fabrikplaner.app.ui.theme.StatusOk
@@ -54,15 +70,25 @@ import de.fabrikplaner.core.graph.Camera
 import de.fabrikplaner.core.graph.CameraMath
 import de.fabrikplaner.core.graph.FlowStatus
 import de.fabrikplaner.core.graph.GraphMetrics
+import de.fabrikplaner.core.graph.GraphPorts
 import de.fabrikplaner.core.model.GraphNode
 import de.fabrikplaner.core.model.ItemForm
 import de.fabrikplaner.core.model.NodeKind
 import de.fabrikplaner.core.model.SavedPlan
 import java.util.Locale
 import kotlin.math.hypot
-import kotlin.math.roundToInt
 
 private data class PortRef(val nodeId: String, val itemId: String, val world: Offset)
+
+private data class EdgeDraw(
+    val start: Offset,
+    val end: Offset,
+    val liquid: Boolean,
+    val letters: String,
+    val colorKey: String,
+    val label: String,
+    val circular: Boolean,
+)
 
 @Composable
 fun FactoryCanvas(
@@ -84,7 +110,9 @@ fun FactoryCanvas(
     modifier: Modifier = Modifier,
 ) {
     val densityScale = LocalDensity.current.density
+    val textMeasurer = rememberTextMeasurer()
     val nodesState = rememberUpdatedState(plan.nodes)
+    val edgesState = rememberUpdatedState(plan.edges)
     val scaleState = rememberUpdatedState(scale)
     val offsetState = rememberUpdatedState(offset)
     val onCameraState = rememberUpdatedState(onCamera)
@@ -92,7 +120,26 @@ fun FactoryCanvas(
     val onMoveState = rememberUpdatedState(onMove)
     val onMoveEndState = rememberUpdatedState(onMoveEnd)
     val onConnectState = rememberUpdatedState(onConnect)
-    var rubberBand by androidx.compose.runtime.remember { mutableStateOf<Pair<Offset, Offset>?>(null) }
+    var rubberBand by remember { mutableStateOf<Pair<Offset, Offset>?>(null) }
+    val edgeDraws = plan.edges.mapNotNull { edge ->
+        val from = plan.nodes.find { it.id == edge.fromNodeId } ?: return@mapNotNull null
+        val to = plan.nodes.find { it.id == edge.toNodeId } ?: return@mapNotNull null
+        val start = portWorld(from, game, plan, edge.itemId, output = true)
+        val end = portWorld(to, game, plan, edge.itemId, output = false)
+        val item = game.itemOrNull(edge.itemId)
+        val name = item?.localized(locale) ?: edge.itemId
+        val rate = balance?.edgeRates?.get(edge.id)
+        val label = rate?.let { "${formatNumber(it, locale)} / min" } ?: ""
+        EdgeDraw(
+            start = start,
+            end = end,
+            liquid = item?.form == ItemForm.LIQUID || item?.form == ItemForm.GAS,
+            letters = monogram(name),
+            colorKey = edge.itemId,
+            label = label,
+            circular = item?.form == ItemForm.LIQUID || item?.form == ItemForm.GAS,
+        )
+    }
     Box(modifier.clipToBounds().background(Color(0xFF101316))) {
         Box(
             Modifier
@@ -115,7 +162,8 @@ fun FactoryCanvas(
                         }
                         val startWorld = worldOf(down.position)
                         val nodes = nodesState.value
-                        val output = findOutput(nodes, game, startWorld)
+                        val edges = edgesState.value
+                        val output = findOutput(nodes, edges, game, startWorld)
                         val node = findNode(nodes, startWorld)
                         val mode = when {
                             output != null -> "connect"
@@ -174,7 +222,7 @@ fun FactoryCanvas(
                         }
                         if (mode == "connect" && output != null) {
                             val end = rubberBand?.second ?: startWorld
-                            val target = findInput(nodesState.value, game, end, output.itemId)
+                            val target = findInput(nodesState.value, edgesState.value, game, end, output.itemId)
                             if (target != null) onConnectState.value(output.nodeId, target, output.itemId)
                         }
                         rubberBand = null
@@ -191,31 +239,50 @@ fun FactoryCanvas(
                     transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0f, 0f)
                 },
             ) {
-                Canvas(Modifier.size(4000.dp, 4000.dp)) {
+                Canvas(Modifier.size(8000.dp, 8000.dp)) {
                     fun px(world: Offset) = Offset(world.x * densityScale, world.y * densityScale)
-                    plan.edges.forEach { edge ->
-                        val from = plan.nodes.find { it.id == edge.fromNodeId } ?: return@forEach
-                        val to = plan.nodes.find { it.id == edge.toNodeId } ?: return@forEach
-                        val start = px(portWorld(from, game, edge.itemId, output = true))
-                        val end = px(portWorld(to, game, edge.itemId, output = false))
+                    edgeDraws.forEach { edge ->
+                        val start = px(edge.start)
+                        val end = px(edge.end)
                         val mid = (start.x + end.x) / 2f
                         val path = Path().apply {
                             moveTo(start.x, start.y)
                             cubicTo(mid, start.y, mid, end.y, end.x, end.y)
                         }
-                        val liquid = game.itemOrNull(edge.itemId)?.form == ItemForm.LIQUID
-                        drawPath(path, if (liquid) PipeLiquid else BeltSolid, style = Stroke(width = 5f))
+                        drawPath(path, if (edge.liquid) PipeLiquid else BeltSolid, style = Stroke(width = 5f))
                     }
                     rubberBand?.let { (start, end) ->
                         drawLine(Color.White, px(start), px(end), strokeWidth = 4f)
                     }
                 }
                 plan.nodes.forEach { node ->
-                    NodeCard(node, game, balance, locale, node.id == selectedId)
+                    val inputs = GraphPorts.orderedInputs(node, game, plan.nodes, plan.edges)
+                    val outputs = GraphPorts.orderedOutputs(node, game, plan.nodes, plan.edges)
+                    NodeCard(
+                        node = node,
+                        game = game,
+                        balance = balance,
+                        locale = locale,
+                        selected = node.id == selectedId,
+                        densityScale = densityScale,
+                        inputs = inputs,
+                        outputs = outputs,
+                    )
+                }
+            }
+            Canvas(Modifier.fillMaxSize()) {
+                val camera = Camera(scale, offset.x, offset.y)
+                edgeDraws.forEach { edge ->
+                    val mid = curveMidpoint(edge.start, edge.end)
+                    val (sx, sy) = CameraMath.worldToScreen(mid.x, mid.y, camera, densityScale)
+                    drawEdgeLabel(Offset(sx, sy), edge, textMeasurer)
                 }
             }
         }
-        Column(Modifier.align(Alignment.BottomEnd).padding(12.dp), verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)) {
+        Column(
+            Modifier.align(Alignment.BottomEnd).padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             FilledTonalIconButton(onClick = { onZoom(1.2f) }) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.zoom_in))
             }
@@ -229,6 +296,55 @@ fun FactoryCanvas(
     }
 }
 
+private fun curveMidpoint(start: Offset, end: Offset): Offset {
+    val midX = (start.x + end.x) / 2f
+    val c1 = Offset(midX, start.y)
+    val c2 = Offset(midX, end.y)
+    val t = 0.5f
+    val u = 1f - t
+    return start * (u * u * u) + c1 * (3f * u * u * t) + c2 * (3f * u * t * t) + end * (t * t * t)
+}
+
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawEdgeLabel(
+    center: Offset,
+    edge: EdgeDraw,
+    textMeasurer: TextMeasurer,
+) {
+    val glyph = 22.dp.toPx()
+    val gap = 4.dp.toPx()
+    val pad = 4.dp.toPx()
+    val textLayout = textMeasurer.measure(
+        text = edge.label,
+        style = TextStyle(color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Medium),
+    )
+    val width = pad + glyph + if (edge.label.isEmpty()) 0f else gap + textLayout.size.width + pad
+    val height = maxOf(glyph, textLayout.size.height.toFloat()) + pad * 2
+    val topLeft = Offset(center.x - width / 2f, center.y - height / 2f)
+    drawRoundRect(
+        color = Color(0xF0101316),
+        topLeft = topLeft,
+        size = Size(width, height),
+        cornerRadius = CornerRadius(height / 2f, height / 2f),
+    )
+    drawMonogram(
+        topLeft = Offset(topLeft.x + pad, topLeft.y + (height - glyph) / 2f),
+        sizePx = glyph,
+        letters = edge.letters,
+        color = glyphColor(edge.colorKey),
+        textMeasurer = textMeasurer,
+        circular = edge.circular,
+    )
+    if (edge.label.isNotEmpty()) {
+        drawText(
+            textLayout,
+            topLeft = Offset(
+                topLeft.x + pad + glyph + gap,
+                topLeft.y + (height - textLayout.size.height) / 2f,
+            ),
+        )
+    }
+}
+
 @Composable
 private fun NodeCard(
     node: GraphNode,
@@ -236,9 +352,11 @@ private fun NodeCard(
     balance: BalanceReport?,
     locale: Locale,
     selected: Boolean,
+    densityScale: Float,
+    inputs: List<String>,
+    outputs: List<String>,
 ) {
     val report = balance?.nodes?.get(node.id)
-    val densityScale = LocalDensity.current.density
     val stripe = when (report?.worst) {
         FlowStatus.UNDER -> StatusUnder
         FlowStatus.OVER -> StatusOver
@@ -246,89 +364,97 @@ private fun NodeCard(
         else -> MaterialTheme.colorScheme.outline
     }
     val recipe = node.recipeId?.let { game.recipeOrNull(it) }
-    val title = recipe?.name?.let { if (locale.language == "en") it.en else it.de }
-        ?: node.itemId?.let { game.itemOrNull(it) }?.let { if (locale.language == "en") it.name.en else it.name.de }
+    val item = node.itemId?.let { game.itemOrNull(it) }
+        ?: recipe?.outputs?.firstOrNull()?.itemId?.let { game.itemOrNull(it) }
+    val title = recipe?.name?.localized(locale)
+        ?: item?.localized(locale)
         ?: node.kind.name
+    val building = node.buildingId?.let { game.buildingOrNull(it) }
+    val buildingName = building?.name?.localized(locale).orEmpty()
     val subtitle = when (node.kind) {
-        NodeKind.RECIPE -> {
-            val building = node.buildingId?.let { game.buildingOrNull(it) }
-            val buildingName = building?.let { if (locale.language == "en") it.name.en else it.name.de }.orEmpty()
-            "$buildingName × ${String.format(locale, "%.2f", node.machineCount)}"
-        }
+        NodeKind.RECIPE -> "$buildingName × ${String.format(locale, "%.2f", node.machineCount)}"
         NodeKind.SOURCE, NodeKind.SINK -> "${String.format(locale, "%.1f", node.ratePerMinute)} / min"
-        else -> node.itemId.orEmpty()
+        else -> item?.localized(locale) ?: node.itemId.orEmpty()
     }
     val shape = RoundedCornerShape(12.dp)
-    Column(
+    Box(
         Modifier
-            .offset { IntOffset((node.x * densityScale).roundToInt(), (node.y * densityScale).roundToInt()) }
-            .size(GraphMetrics.CARD_W.dp, GraphMetrics.CARD_H.dp)
-            .background(MaterialTheme.colorScheme.surfaceVariant, shape)
-            .border(if (selected) 3.dp else 1.dp, if (selected) MaterialTheme.colorScheme.primary else stripe, shape)
-            .padding(10.dp),
+            .graphicsLayer {
+                translationX = node.x * densityScale
+                translationY = node.y * densityScale
+            }
+            .size(GraphMetrics.CARD_W.dp, GraphMetrics.CARD_H.dp),
     ) {
-        Text(title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(subtitle, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        val line = report?.inputs?.firstOrNull() ?: report?.outputs?.firstOrNull()
-        if (line != null) {
-            val name = game.itemOrNull(line.itemId)?.let { if (locale.language == "en") it.name.en else it.name.de } ?: line.itemId
-            Text(
-                "$name ${String.format(locale, "%.1f", line.actualPerMinute)}/${String.format(locale, "%.1f", line.expectedPerMinute)}",
-                color = stripe,
-                style = MaterialTheme.typography.bodySmall,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
+        Column(
+            Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surfaceVariant, shape)
+                .border(if (selected) 3.dp else 1.dp, if (selected) MaterialTheme.colorScheme.primary else stripe, shape)
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 6.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ItemGlyph(
+                    name = item?.localized(locale) ?: title,
+                    key = item?.id ?: node.id,
+                    form = item?.form,
+                    size = 32.dp,
+                )
+                Column(Modifier.weight(1f)) {
+                    Text(title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        if (building != null) {
+                            BuildingGlyph(buildingName, building.id, size = 16.dp)
+                        }
+                        Text(
+                            subtitle,
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                }
+            }
+        }
+        inputs.forEachIndexed { index, _ ->
+            PortDot(
+                y = GraphMetrics.portY(index, inputs.size),
+                onRight = false,
+                color = Color(0xFF90A4AE),
             )
         }
-        Box(Modifier.fillMaxSize()) {
-            val inputs = inputItems(node, game)
-            val outputs = outputItems(node, game)
-            inputs.forEachIndexed { index, _ ->
-                PortDot(
-                    Modifier.align(Alignment.CenterStart).offset(x = (-16).dp, y = portOffset(index, inputs.size)),
-                    Color(0xFF90A4AE),
-                )
-            }
-            outputs.forEachIndexed { index, itemId ->
-                val liquid = game.itemOrNull(itemId)?.form == ItemForm.LIQUID
-                PortDot(
-                    Modifier.align(Alignment.CenterEnd).offset(x = 16.dp, y = portOffset(index, outputs.size)),
-                    if (liquid) PipeLiquid else BeltSolid,
-                )
-            }
+        outputs.forEachIndexed { index, itemId ->
+            val liquid = game.itemOrNull(itemId)?.form == ItemForm.LIQUID || game.itemOrNull(itemId)?.form == ItemForm.GAS
+            PortDot(
+                y = GraphMetrics.portY(index, outputs.size),
+                onRight = true,
+                color = if (liquid) PipeLiquid else BeltSolid,
+            )
         }
     }
 }
 
 @Composable
-private fun PortDot(modifier: Modifier, color: Color) {
-    Box(modifier.size(14.dp).background(color, CircleShape))
+private fun PortDot(y: Float, onRight: Boolean, color: Color) {
+    val radius = GraphMetrics.PORT_RADIUS
+    val x = if (onRight) GraphMetrics.CARD_W - radius else -radius
+    Box(
+        Modifier
+            .graphicsLayer {
+                translationX = x * density
+                translationY = (y - radius) * density
+            }
+            .size((radius * 2f).dp)
+            .background(color, CircleShape),
+    )
 }
 
-private fun portOffset(index: Int, count: Int): androidx.compose.ui.unit.Dp {
-    if (count <= 1) return 8.dp
-    val span = 36f
-    val start = -span / 2f
-    return (start + span * index / (count - 1)).dp
-}
-
-private fun inputItems(node: GraphNode, game: GameData): List<String> = when (node.kind) {
-    NodeKind.RECIPE -> node.recipeId?.let { game.recipeOrNull(it) }?.inputs?.map { it.itemId }.orEmpty()
-    NodeKind.SINK, NodeKind.SPLITTER, NodeKind.MERGER -> listOfNotNull(node.itemId)
-    NodeKind.SOURCE -> emptyList()
-}
-
-private fun outputItems(node: GraphNode, game: GameData): List<String> = when (node.kind) {
-    NodeKind.RECIPE -> node.recipeId?.let { game.recipeOrNull(it) }?.outputs?.map { it.itemId }.orEmpty()
-    NodeKind.SOURCE, NodeKind.SPLITTER, NodeKind.MERGER -> listOfNotNull(node.itemId)
-    NodeKind.SINK -> emptyList()
-}
-
-private fun portWorld(node: GraphNode, game: GameData, itemId: String, output: Boolean): Offset {
-    val items = if (output) outputItems(node, game) else inputItems(node, game)
-    val index = items.indexOf(itemId).let { if (it < 0) 0 else it }
-    val point = if (output) GraphMetrics.outputPort(node, index, items.size.coerceAtLeast(1))
-    else GraphMetrics.inputPort(node, index, items.size.coerceAtLeast(1))
+private fun portWorld(node: GraphNode, game: GameData, plan: SavedPlan, itemId: String, output: Boolean): Offset {
+    val point = if (output) {
+        GraphPorts.outputCenter(node, itemId, game, plan.nodes, plan.edges)
+    } else {
+        GraphPorts.inputCenter(node, itemId, game, plan.nodes, plan.edges)
+    }
     return Offset(point.first, point.second)
 }
 
@@ -337,12 +463,12 @@ private fun findNode(nodes: List<GraphNode>, world: Offset): GraphNode? =
         world.x in node.x..(node.x + GraphMetrics.CARD_W) && world.y in node.y..(node.y + GraphMetrics.CARD_H)
     }
 
-private fun findOutput(nodes: List<GraphNode>, game: GameData, world: Offset): PortRef? {
+private fun findOutput(nodes: List<GraphNode>, edges: List<de.fabrikplaner.core.model.GraphEdge>, game: GameData, world: Offset): PortRef? {
     var best: PortRef? = null
     var bestDist = 28f
     for (node in nodes) {
-        outputItems(node, game).forEachIndexed { index, itemId ->
-            val point = GraphMetrics.outputPort(node, index, outputItems(node, game).size)
+        GraphPorts.orderedOutputs(node, game, nodes, edges).forEach { itemId ->
+            val point = GraphPorts.outputCenter(node, itemId, game, nodes, edges)
             val dist = hypot(world.x - point.first, world.y - point.second)
             if (dist < bestDist) {
                 bestDist = dist
@@ -353,22 +479,26 @@ private fun findOutput(nodes: List<GraphNode>, game: GameData, world: Offset): P
     return best
 }
 
-private fun findInput(nodes: List<GraphNode>, game: GameData, world: Offset, itemId: String): String? {
+private fun findInput(
+    nodes: List<GraphNode>,
+    edges: List<de.fabrikplaner.core.model.GraphEdge>,
+    game: GameData,
+    world: Offset,
+    itemId: String,
+): String? {
     var best: String? = null
     var bestDist = 36f
     for (node in nodes) {
-        val items = inputItems(node, game)
-        items.forEachIndexed { index, candidate ->
-            if (candidate != itemId) return@forEachIndexed
-            val point = GraphMetrics.inputPort(node, index, items.size)
-            val dist = hypot(world.x - point.first, world.y - point.second)
-            if (dist < bestDist) {
-                bestDist = dist
-                best = node.id
-            }
+        val items = GraphPorts.orderedInputs(node, game, nodes, edges)
+        if (itemId !in items) continue
+        val point = GraphPorts.inputCenter(node, itemId, game, nodes, edges)
+        val dist = hypot(world.x - point.first, world.y - point.second)
+        if (dist < bestDist) {
+            bestDist = dist
+            best = node.id
         }
     }
     if (best != null) return best
     val node = findNode(nodes, world) ?: return null
-    return if (inputItems(node, game).contains(itemId)) node.id else null
+    return if (GraphPorts.inputs(node, game).contains(itemId)) node.id else null
 }

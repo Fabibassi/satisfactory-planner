@@ -55,7 +55,7 @@ import de.fabrikplaner.core.model.NodeKind
 import java.util.Locale
 import kotlin.math.roundToInt
 
-private enum class Picker { NONE, MACHINE_ITEM, SOURCE, SINK, SPLITTER, MERGER, RECIPE }
+private enum class Picker { NONE, MACHINE_ITEM, SOURCE, SINK, SPLITTER, MERGER, RECIPE, NODE_RECIPE }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -183,6 +183,9 @@ fun EditorScreen(
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FilterChip(false, { picker = Picker.SPLITTER }, { Text(stringResource(R.string.add_splitter)) })
                     FilterChip(false, { picker = Picker.MERGER }, { Text(stringResource(R.string.add_merger)) })
+                    if (viewModel.choiceItemIds(viewModel.result).isNotEmpty()) {
+                        FilterChip(false, { viewModel.openRecipePrompt() }, { Text(stringResource(R.string.recipe_prompt_button)) })
+                    }
                 }
                 if (selected == null) {
                     Text(stringResource(R.string.no_selection_hint))
@@ -193,6 +196,7 @@ fun EditorScreen(
                             viewModel = viewModel,
                             locale = locale,
                             onDeleted = { selectedId = null },
+                            onChangeRecipe = { recipeItem = selectedPrimary(selected, viewModel); picker = Picker.NODE_RECIPE },
                         )
                     }
                 }
@@ -243,9 +247,24 @@ fun EditorScreen(
                 picker = Picker.NONE
             },
         )
-        Picker.RECIPE, Picker.NONE -> Unit
+        Picker.RECIPE, Picker.NODE_RECIPE, Picker.NONE -> Unit
     }
     val chosenItem = recipeItem
+    if (picker == Picker.NODE_RECIPE && chosenItem != null) {
+        RecipePickerDialog(
+            game = viewModel.game,
+            itemId = chosenItem,
+            onDismiss = {
+                picker = Picker.NONE
+                recipeItem = null
+            },
+            onPick = { recipeId ->
+                viewModel.changeNodeRecipe(chosenItem, recipeId)
+                picker = Picker.NONE
+                recipeItem = null
+            },
+        )
+    }
     if (picker == Picker.RECIPE && chosenItem != null) {
         RecipePickerDialog(
             game = viewModel.game,
@@ -270,6 +289,7 @@ private fun NodeEditor(
     viewModel: PlannerViewModel,
     locale: Locale,
     onDeleted: () -> Unit,
+    onChangeRecipe: () -> Unit,
 ) {
     val plan = viewModel.current ?: return
     Text(nodeTitle(node, viewModel, locale), style = MaterialTheme.typography.titleSmall)
@@ -290,6 +310,11 @@ private fun NodeEditor(
     }
     when (node.kind) {
         NodeKind.RECIPE -> {
+            val primary = node.recipeId?.let { viewModel.game.recipeOrNull(it) }?.outputs?.firstOrNull()?.itemId
+            if (primary != null && viewModel.game.recipesProducing(primary).size > 1) {
+                OutlinedButton(onClick = onChangeRecipe) { Text(stringResource(R.string.change_recipe)) }
+                Text(stringResource(R.string.change_recipe_note), style = MaterialTheme.typography.bodySmall)
+            }
             var countText by rememberSaveable(node.id) { mutableStateOf(formatNumber(node.machineCount, locale)) }
             OutlinedTextField(
                 value = countText,
@@ -360,6 +385,9 @@ private fun nodeTitle(node: GraphNode, viewModel: PlannerViewModel, locale: Loca
     }
     return "$kind $item".trim()
 }
+
+private fun selectedPrimary(node: GraphNode, viewModel: PlannerViewModel): String? =
+    node.recipeId?.let { viewModel.game.recipeOrNull(it) }?.outputs?.firstOrNull()?.itemId
 
 @Composable
 private fun statusLabel(status: FlowStatus): String = when (status) {
