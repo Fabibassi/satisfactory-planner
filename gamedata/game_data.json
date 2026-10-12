@@ -1,0 +1,2457 @@
+{
+  "gameVersion": "1.0",
+  "source": "Satisfactory 1.0 crafting rates compiled from the public wiki tables at satisfactory.wiki.gg (October 2026). Includes standard recipes and a curated set of alternate recipes. Unofficial fan data; not affiliated with Coffee Stain Studios. Regenerate with tools/build_game_data.py.",
+  "items": [
+    {
+      "id": "iron_ore",
+      "name": {
+        "de": "Eisenerz",
+        "en": "Iron Ore"
+      },
+      "form": "solid",
+      "raw": true,
+      "category": "raw",
+      "extractorId": "miner_mk1",
+      "extractPerMinute": 60
+    },
+    {
+      "id": "copper_ore",
+      "name": {
+        "de": "Kupfererz",
+        "en": "Copper Ore"
+      },
+      "form": "solid",
+      "raw": true,
+      "category": "raw",
+      "extractorId": "miner_mk1",
+      "extractPerMinute": 60
+    },
+    {
+      "id": "limestone",
+      "name": {
+        "de": "Kalkstein",
+        "en": "Limestone"
+      },
+      "form": "solid",
+      "raw": true,
+      "category": "raw",
+      "extractorId": "miner_mk1",
+      "extractPerMinute": 60
+    },
+    {
+      "id": "coal",
+      "name": {
+        "de": "Kohle",
+        "en": "Coal"
+      },
+      "form": "solid",
+      "raw": true,
+      "category": "raw",
+      "extractorId": "miner_mk1",
+      "extractPerMinute": 60
+    },
+    {
+      "id": "caterium_ore",
+      "name": {
+        "de": "Caterium-Erz",
+        "en": "Caterium Ore"
+      },
+      "form": "solid",
+      "raw": true,
+      "category": "raw",
+      "extractorId": "miner_mk1",
+      "extractPerMinute": 60
+    },
+    {
+      "id": "raw_quartz",
+      "name": {
+        "de": "Rohquarz",
+        "en": "Raw Quartz"
+      },
+      "form": "solid",
+      "raw": true,
+      "category": "raw",
+      "extractorId": "miner_mk1",
+      "extractPerMinute": 60
+    },
+    {
+      "id": "bauxite",
+      "name": {
+        "de": "Bauxit",
+        "en": "Bauxite"
+      },
+      "form": "solid",
+      "raw": true,
+      "category": "raw",
+      "extractorId": "miner_mk1",
+      "extractPerMinute": 60
+    },
+    {
+      "id": "crude_oil",
+      "name": {
+        "de": "Rohöl",
+        "en": "Crude Oil"
+      },
+      "form": "liquid",
+      "raw": true,
+      "category": "raw",
+      "extractorId": "oil_extractor",
+      "extractPerMinute": 120
+    },
+    {
+      "id": "water",
+      "name": {
+        "de": "Wasser",
+        "en": "Water"
+      },
+      "form": "liquid",
+      "raw": true,
+      "category": "raw",
+      "extractorId": "water_extractor",
+      "extractPerMinute": 120
+    },
+    {
+      "id": "iron_ingot",
+      "name": {
+        "de": "Eisenbarren",
+        "en": "Iron Ingot"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "ingot"
+    },
+    {
+      "id": "copper_ingot",
+      "name": {
+        "de": "Kupferbarren",
+        "en": "Copper Ingot"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "ingot"
+    },
+    {
+      "id": "caterium_ingot",
+      "name": {
+        "de": "Cateriumbarren",
+        "en": "Caterium Ingot"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "ingot"
+    },
+    {
+      "id": "steel_ingot",
+      "name": {
+        "de": "Stahlbarren",
+        "en": "Steel Ingot"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "ingot"
+    },
+    {
+      "id": "aluminum_ingot",
+      "name": {
+        "de": "Aluminiumbarren",
+        "en": "Aluminum Ingot"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "ingot"
+    },
+    {
+      "id": "iron_plate",
+      "name": {
+        "de": "Eisenplatte",
+        "en": "Iron Plate"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "basic"
+    },
+    {
+      "id": "iron_rod",
+      "name": {
+        "de": "Eisenstange",
+        "en": "Iron Rod"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "basic"
+    },
+    {
+      "id": "screw",
+      "name": {
+        "de": "Schraube",
+        "en": "Screw"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "basic"
+    },
+    {
+      "id": "wire",
+      "name": {
+        "de": "Draht",
+        "en": "Wire"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "basic"
+    },
+    {
+      "id": "cable",
+      "name": {
+        "de": "Kabel",
+        "en": "Cable"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "basic"
+    },
+    {
+      "id": "concrete",
+      "name": {
+        "de": "Beton",
+        "en": "Concrete"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "basic"
+    },
+    {
+      "id": "copper_sheet",
+      "name": {
+        "de": "Kupferblech",
+        "en": "Copper Sheet"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "basic"
+    },
+    {
+      "id": "quartz_crystal",
+      "name": {
+        "de": "Quarzkristall",
+        "en": "Quartz Crystal"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "basic"
+    },
+    {
+      "id": "silica",
+      "name": {
+        "de": "Quarzsand",
+        "en": "Silica"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "basic"
+    },
+    {
+      "id": "quickwire",
+      "name": {
+        "de": "Schnelldraht",
+        "en": "Quickwire"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "basic"
+    },
+    {
+      "id": "reinforced_iron_plate",
+      "name": {
+        "de": "Verstärkte Eisenplatte",
+        "en": "Reinforced Iron Plate"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "industrial"
+    },
+    {
+      "id": "rotor",
+      "name": {
+        "de": "Rotor",
+        "en": "Rotor"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "industrial"
+    },
+    {
+      "id": "modular_frame",
+      "name": {
+        "de": "Modularer Rahmen",
+        "en": "Modular Frame"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "industrial"
+    },
+    {
+      "id": "steel_beam",
+      "name": {
+        "de": "Stahlträger",
+        "en": "Steel Beam"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "industrial"
+    },
+    {
+      "id": "steel_pipe",
+      "name": {
+        "de": "Stahlrohr",
+        "en": "Steel Pipe"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "industrial"
+    },
+    {
+      "id": "encased_industrial_beam",
+      "name": {
+        "de": "Ummantelter Industriebalken",
+        "en": "Encased Industrial Beam"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "industrial"
+    },
+    {
+      "id": "stator",
+      "name": {
+        "de": "Stator",
+        "en": "Stator"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "industrial"
+    },
+    {
+      "id": "motor",
+      "name": {
+        "de": "Motor",
+        "en": "Motor"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "industrial"
+    },
+    {
+      "id": "smart_plating",
+      "name": {
+        "de": "Intelligente Panzerung",
+        "en": "Smart Plating"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "industrial"
+    },
+    {
+      "id": "versatile_framework",
+      "name": {
+        "de": "Vielseitiges Gerüst",
+        "en": "Versatile Framework"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "industrial"
+    },
+    {
+      "id": "heavy_modular_frame",
+      "name": {
+        "de": "Schwerer modularer Rahmen",
+        "en": "Heavy Modular Frame"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "advanced"
+    },
+    {
+      "id": "plastic",
+      "name": {
+        "de": "Kunststoff",
+        "en": "Plastic"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "oil",
+      "defaultRecipeId": "plastic"
+    },
+    {
+      "id": "rubber",
+      "name": {
+        "de": "Gummi",
+        "en": "Rubber"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "oil",
+      "defaultRecipeId": "rubber"
+    },
+    {
+      "id": "heavy_oil_residue",
+      "name": {
+        "de": "Schwerölrückstand",
+        "en": "Heavy Oil Residue"
+      },
+      "form": "liquid",
+      "raw": false,
+      "category": "oil"
+    },
+    {
+      "id": "fuel",
+      "name": {
+        "de": "Treibstoff",
+        "en": "Fuel"
+      },
+      "form": "liquid",
+      "raw": false,
+      "category": "oil",
+      "defaultRecipeId": "fuel"
+    },
+    {
+      "id": "polymer_resin",
+      "name": {
+        "de": "Polymerharz",
+        "en": "Polymer Resin"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "oil"
+    },
+    {
+      "id": "petroleum_coke",
+      "name": {
+        "de": "Petrolkoks",
+        "en": "Petroleum Coke"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "oil"
+    },
+    {
+      "id": "empty_canister",
+      "name": {
+        "de": "Leerer Kanister",
+        "en": "Empty Canister"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "oil"
+    },
+    {
+      "id": "circuit_board",
+      "name": {
+        "de": "Platine",
+        "en": "Circuit Board"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "electronics"
+    },
+    {
+      "id": "computer",
+      "name": {
+        "de": "Computer",
+        "en": "Computer"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "electronics"
+    },
+    {
+      "id": "ai_limiter",
+      "name": {
+        "de": "KI-Begrenzer",
+        "en": "AI Limiter"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "electronics"
+    },
+    {
+      "id": "high_speed_connector",
+      "name": {
+        "de": "Hochgeschwindigkeitsstecker",
+        "en": "High-Speed Connector"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "electronics"
+    },
+    {
+      "id": "automated_wiring",
+      "name": {
+        "de": "Automatisierte Verkabelung",
+        "en": "Automated Wiring"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "electronics"
+    },
+    {
+      "id": "alumina_solution",
+      "name": {
+        "de": "Aluminiumlösung",
+        "en": "Alumina Solution"
+      },
+      "form": "liquid",
+      "raw": false,
+      "category": "aluminum"
+    },
+    {
+      "id": "aluminum_scrap",
+      "name": {
+        "de": "Aluminiumschrott",
+        "en": "Aluminum Scrap"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "aluminum"
+    },
+    {
+      "id": "aluminum_casing",
+      "name": {
+        "de": "Aluminiumgehäuse",
+        "en": "Aluminum Casing"
+      },
+      "form": "solid",
+      "raw": false,
+      "category": "aluminum"
+    }
+  ],
+  "buildings": [
+    {
+      "id": "miner_mk1",
+      "name": {
+        "de": "Miner Mk.1",
+        "en": "Miner Mk.1"
+      },
+      "powerMw": 5
+    },
+    {
+      "id": "water_extractor",
+      "name": {
+        "de": "Wasserpumpe",
+        "en": "Water Extractor"
+      },
+      "powerMw": 20
+    },
+    {
+      "id": "oil_extractor",
+      "name": {
+        "de": "Ölförderer",
+        "en": "Oil Extractor"
+      },
+      "powerMw": 40
+    },
+    {
+      "id": "smelter",
+      "name": {
+        "de": "Schmelze",
+        "en": "Smelter"
+      },
+      "powerMw": 4
+    },
+    {
+      "id": "constructor",
+      "name": {
+        "de": "Konstruktor",
+        "en": "Constructor"
+      },
+      "powerMw": 4
+    },
+    {
+      "id": "assembler",
+      "name": {
+        "de": "Montierer",
+        "en": "Assembler"
+      },
+      "powerMw": 15
+    },
+    {
+      "id": "foundry",
+      "name": {
+        "de": "Gießerei",
+        "en": "Foundry"
+      },
+      "powerMw": 16
+    },
+    {
+      "id": "manufacturer",
+      "name": {
+        "de": "Manufaktor",
+        "en": "Manufacturer"
+      },
+      "powerMw": 55
+    },
+    {
+      "id": "refinery",
+      "name": {
+        "de": "Raffinerie",
+        "en": "Refinery"
+      },
+      "powerMw": 30
+    },
+    {
+      "id": "blender",
+      "name": {
+        "de": "Mischer",
+        "en": "Blender"
+      },
+      "powerMw": 75
+    },
+    {
+      "id": "packager",
+      "name": {
+        "de": "Verpacker",
+        "en": "Packager"
+      },
+      "powerMw": 10
+    }
+  ],
+  "recipes": [
+    {
+      "id": "iron_ingot",
+      "name": {
+        "de": "Eisenbarren",
+        "en": "Iron Ingot"
+      },
+      "alternate": false,
+      "buildingId": "smelter",
+      "cycleSeconds": 2,
+      "inputs": [
+        {
+          "itemId": "iron_ore",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "iron_ingot",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "copper_ingot",
+      "name": {
+        "de": "Kupferbarren",
+        "en": "Copper Ingot"
+      },
+      "alternate": false,
+      "buildingId": "smelter",
+      "cycleSeconds": 2,
+      "inputs": [
+        {
+          "itemId": "copper_ore",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "copper_ingot",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "caterium_ingot",
+      "name": {
+        "de": "Cateriumbarren",
+        "en": "Caterium Ingot"
+      },
+      "alternate": false,
+      "buildingId": "smelter",
+      "cycleSeconds": 4,
+      "inputs": [
+        {
+          "itemId": "caterium_ore",
+          "amount": 3
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "caterium_ingot",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "iron_plate",
+      "name": {
+        "de": "Eisenplatte",
+        "en": "Iron Plate"
+      },
+      "alternate": false,
+      "buildingId": "constructor",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "iron_ingot",
+          "amount": 3
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "iron_plate",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "id": "iron_rod",
+      "name": {
+        "de": "Eisenstange",
+        "en": "Iron Rod"
+      },
+      "alternate": false,
+      "buildingId": "constructor",
+      "cycleSeconds": 4,
+      "inputs": [
+        {
+          "itemId": "iron_ingot",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "iron_rod",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "screw",
+      "name": {
+        "de": "Schraube",
+        "en": "Screw"
+      },
+      "alternate": false,
+      "buildingId": "constructor",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "iron_rod",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "screw",
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "id": "wire",
+      "name": {
+        "de": "Draht",
+        "en": "Wire"
+      },
+      "alternate": false,
+      "buildingId": "constructor",
+      "cycleSeconds": 4,
+      "inputs": [
+        {
+          "itemId": "copper_ingot",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "wire",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "id": "cable",
+      "name": {
+        "de": "Kabel",
+        "en": "Cable"
+      },
+      "alternate": false,
+      "buildingId": "constructor",
+      "cycleSeconds": 2,
+      "inputs": [
+        {
+          "itemId": "wire",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "cable",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "concrete",
+      "name": {
+        "de": "Beton",
+        "en": "Concrete"
+      },
+      "alternate": false,
+      "buildingId": "constructor",
+      "cycleSeconds": 4,
+      "inputs": [
+        {
+          "itemId": "limestone",
+          "amount": 3
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "concrete",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "copper_sheet",
+      "name": {
+        "de": "Kupferblech",
+        "en": "Copper Sheet"
+      },
+      "alternate": false,
+      "buildingId": "constructor",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "copper_ingot",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "copper_sheet",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "quartz_crystal",
+      "name": {
+        "de": "Quarzkristall",
+        "en": "Quartz Crystal"
+      },
+      "alternate": false,
+      "buildingId": "constructor",
+      "cycleSeconds": 8,
+      "inputs": [
+        {
+          "itemId": "raw_quartz",
+          "amount": 5
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "quartz_crystal",
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "id": "silica",
+      "name": {
+        "de": "Quarzsand",
+        "en": "Silica"
+      },
+      "alternate": false,
+      "buildingId": "constructor",
+      "cycleSeconds": 8,
+      "inputs": [
+        {
+          "itemId": "raw_quartz",
+          "amount": 3
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "silica",
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "id": "quickwire",
+      "name": {
+        "de": "Schnelldraht",
+        "en": "Quickwire"
+      },
+      "alternate": false,
+      "buildingId": "constructor",
+      "cycleSeconds": 5,
+      "inputs": [
+        {
+          "itemId": "caterium_ingot",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "quickwire",
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "id": "reinforced_iron_plate",
+      "name": {
+        "de": "Verstärkte Eisenplatte",
+        "en": "Reinforced Iron Plate"
+      },
+      "alternate": false,
+      "buildingId": "assembler",
+      "cycleSeconds": 12,
+      "inputs": [
+        {
+          "itemId": "iron_plate",
+          "amount": 6
+        },
+        {
+          "itemId": "screw",
+          "amount": 12
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "reinforced_iron_plate",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "rotor",
+      "name": {
+        "de": "Rotor",
+        "en": "Rotor"
+      },
+      "alternate": false,
+      "buildingId": "assembler",
+      "cycleSeconds": 15,
+      "inputs": [
+        {
+          "itemId": "iron_rod",
+          "amount": 5
+        },
+        {
+          "itemId": "screw",
+          "amount": 25
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "rotor",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "modular_frame",
+      "name": {
+        "de": "Modularer Rahmen",
+        "en": "Modular Frame"
+      },
+      "alternate": false,
+      "buildingId": "assembler",
+      "cycleSeconds": 60,
+      "inputs": [
+        {
+          "itemId": "reinforced_iron_plate",
+          "amount": 3
+        },
+        {
+          "itemId": "iron_rod",
+          "amount": 12
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "modular_frame",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "id": "steel_ingot",
+      "name": {
+        "de": "Stahlbarren",
+        "en": "Steel Ingot"
+      },
+      "alternate": false,
+      "buildingId": "foundry",
+      "cycleSeconds": 4,
+      "inputs": [
+        {
+          "itemId": "iron_ore",
+          "amount": 3
+        },
+        {
+          "itemId": "coal",
+          "amount": 3
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "steel_ingot",
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "id": "steel_beam",
+      "name": {
+        "de": "Stahlträger",
+        "en": "Steel Beam"
+      },
+      "alternate": false,
+      "buildingId": "constructor",
+      "cycleSeconds": 4,
+      "inputs": [
+        {
+          "itemId": "steel_ingot",
+          "amount": 4
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "steel_beam",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "steel_pipe",
+      "name": {
+        "de": "Stahlrohr",
+        "en": "Steel Pipe"
+      },
+      "alternate": false,
+      "buildingId": "constructor",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "steel_ingot",
+          "amount": 3
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "steel_pipe",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "id": "encased_industrial_beam",
+      "name": {
+        "de": "Ummantelter Industriebalken",
+        "en": "Encased Industrial Beam"
+      },
+      "alternate": false,
+      "buildingId": "assembler",
+      "cycleSeconds": 10,
+      "inputs": [
+        {
+          "itemId": "steel_beam",
+          "amount": 3
+        },
+        {
+          "itemId": "concrete",
+          "amount": 6
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "encased_industrial_beam",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "stator",
+      "name": {
+        "de": "Stator",
+        "en": "Stator"
+      },
+      "alternate": false,
+      "buildingId": "assembler",
+      "cycleSeconds": 12,
+      "inputs": [
+        {
+          "itemId": "steel_pipe",
+          "amount": 3
+        },
+        {
+          "itemId": "wire",
+          "amount": 8
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "stator",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "motor",
+      "name": {
+        "de": "Motor",
+        "en": "Motor"
+      },
+      "alternate": false,
+      "buildingId": "assembler",
+      "cycleSeconds": 12,
+      "inputs": [
+        {
+          "itemId": "rotor",
+          "amount": 2
+        },
+        {
+          "itemId": "stator",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "motor",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "smart_plating",
+      "name": {
+        "de": "Intelligente Panzerung",
+        "en": "Smart Plating"
+      },
+      "alternate": false,
+      "buildingId": "assembler",
+      "cycleSeconds": 30,
+      "inputs": [
+        {
+          "itemId": "reinforced_iron_plate",
+          "amount": 1
+        },
+        {
+          "itemId": "rotor",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "smart_plating",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "versatile_framework",
+      "name": {
+        "de": "Vielseitiges Gerüst",
+        "en": "Versatile Framework"
+      },
+      "alternate": false,
+      "buildingId": "assembler",
+      "cycleSeconds": 24,
+      "inputs": [
+        {
+          "itemId": "modular_frame",
+          "amount": 1
+        },
+        {
+          "itemId": "steel_beam",
+          "amount": 12
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "versatile_framework",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "id": "heavy_modular_frame",
+      "name": {
+        "de": "Schwerer modularer Rahmen",
+        "en": "Heavy Modular Frame"
+      },
+      "alternate": false,
+      "buildingId": "manufacturer",
+      "cycleSeconds": 30,
+      "inputs": [
+        {
+          "itemId": "modular_frame",
+          "amount": 5
+        },
+        {
+          "itemId": "steel_pipe",
+          "amount": 20
+        },
+        {
+          "itemId": "encased_industrial_beam",
+          "amount": 5
+        },
+        {
+          "itemId": "screw",
+          "amount": 120
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "heavy_modular_frame",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "plastic",
+      "name": {
+        "de": "Kunststoff",
+        "en": "Plastic"
+      },
+      "alternate": false,
+      "buildingId": "refinery",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "crude_oil",
+          "amount": 3
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "plastic",
+          "amount": 2
+        },
+        {
+          "itemId": "heavy_oil_residue",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "rubber",
+      "name": {
+        "de": "Gummi",
+        "en": "Rubber"
+      },
+      "alternate": false,
+      "buildingId": "refinery",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "crude_oil",
+          "amount": 3
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "rubber",
+          "amount": 2
+        },
+        {
+          "itemId": "heavy_oil_residue",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "id": "fuel",
+      "name": {
+        "de": "Treibstoff",
+        "en": "Fuel"
+      },
+      "alternate": false,
+      "buildingId": "refinery",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "crude_oil",
+          "amount": 6
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "fuel",
+          "amount": 4
+        },
+        {
+          "itemId": "polymer_resin",
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "id": "residual_fuel",
+      "name": {
+        "de": "Resttreibstoff",
+        "en": "Residual Fuel"
+      },
+      "alternate": false,
+      "buildingId": "refinery",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "heavy_oil_residue",
+          "amount": 6
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "fuel",
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "id": "residual_plastic",
+      "name": {
+        "de": "Restkunststoff",
+        "en": "Residual Plastic"
+      },
+      "alternate": false,
+      "buildingId": "refinery",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "polymer_resin",
+          "amount": 6
+        },
+        {
+          "itemId": "water",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "plastic",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "id": "residual_rubber",
+      "name": {
+        "de": "Restgummi",
+        "en": "Residual Rubber"
+      },
+      "alternate": false,
+      "buildingId": "refinery",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "polymer_resin",
+          "amount": 4
+        },
+        {
+          "itemId": "water",
+          "amount": 4
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "rubber",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "id": "petroleum_coke",
+      "name": {
+        "de": "Petrolkoks",
+        "en": "Petroleum Coke"
+      },
+      "alternate": false,
+      "buildingId": "refinery",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "heavy_oil_residue",
+          "amount": 4
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "petroleum_coke",
+          "amount": 12
+        }
+      ]
+    },
+    {
+      "id": "circuit_board",
+      "name": {
+        "de": "Platine",
+        "en": "Circuit Board"
+      },
+      "alternate": false,
+      "buildingId": "assembler",
+      "cycleSeconds": 8,
+      "inputs": [
+        {
+          "itemId": "copper_sheet",
+          "amount": 2
+        },
+        {
+          "itemId": "plastic",
+          "amount": 4
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "circuit_board",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "computer",
+      "name": {
+        "de": "Computer",
+        "en": "Computer"
+      },
+      "alternate": false,
+      "buildingId": "manufacturer",
+      "cycleSeconds": 24,
+      "inputs": [
+        {
+          "itemId": "circuit_board",
+          "amount": 4
+        },
+        {
+          "itemId": "cable",
+          "amount": 8
+        },
+        {
+          "itemId": "plastic",
+          "amount": 16
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "computer",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "empty_canister",
+      "name": {
+        "de": "Leerer Kanister",
+        "en": "Empty Canister"
+      },
+      "alternate": false,
+      "buildingId": "constructor",
+      "cycleSeconds": 4,
+      "inputs": [
+        {
+          "itemId": "plastic",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "empty_canister",
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "id": "ai_limiter",
+      "name": {
+        "de": "KI-Begrenzer",
+        "en": "AI Limiter"
+      },
+      "alternate": false,
+      "buildingId": "assembler",
+      "cycleSeconds": 12,
+      "inputs": [
+        {
+          "itemId": "copper_sheet",
+          "amount": 5
+        },
+        {
+          "itemId": "quickwire",
+          "amount": 20
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "ai_limiter",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "high_speed_connector",
+      "name": {
+        "de": "Hochgeschwindigkeitsstecker",
+        "en": "High-Speed Connector"
+      },
+      "alternate": false,
+      "buildingId": "manufacturer",
+      "cycleSeconds": 16,
+      "inputs": [
+        {
+          "itemId": "quickwire",
+          "amount": 56
+        },
+        {
+          "itemId": "cable",
+          "amount": 10
+        },
+        {
+          "itemId": "circuit_board",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "high_speed_connector",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "automated_wiring",
+      "name": {
+        "de": "Automatisierte Verkabelung",
+        "en": "Automated Wiring"
+      },
+      "alternate": false,
+      "buildingId": "assembler",
+      "cycleSeconds": 24,
+      "inputs": [
+        {
+          "itemId": "stator",
+          "amount": 1
+        },
+        {
+          "itemId": "cable",
+          "amount": 20
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "automated_wiring",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "alumina_solution",
+      "name": {
+        "de": "Aluminiumlösung",
+        "en": "Alumina Solution"
+      },
+      "alternate": false,
+      "buildingId": "refinery",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "bauxite",
+          "amount": 12
+        },
+        {
+          "itemId": "water",
+          "amount": 18
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "alumina_solution",
+          "amount": 12
+        },
+        {
+          "itemId": "silica",
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "id": "aluminum_scrap",
+      "name": {
+        "de": "Aluminiumschrott",
+        "en": "Aluminum Scrap"
+      },
+      "alternate": false,
+      "buildingId": "refinery",
+      "cycleSeconds": 1,
+      "inputs": [
+        {
+          "itemId": "alumina_solution",
+          "amount": 4
+        },
+        {
+          "itemId": "coal",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "aluminum_scrap",
+          "amount": 6
+        },
+        {
+          "itemId": "water",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "id": "aluminum_ingot",
+      "name": {
+        "de": "Aluminiumbarren",
+        "en": "Aluminum Ingot"
+      },
+      "alternate": false,
+      "buildingId": "foundry",
+      "cycleSeconds": 4,
+      "inputs": [
+        {
+          "itemId": "aluminum_scrap",
+          "amount": 6
+        },
+        {
+          "itemId": "silica",
+          "amount": 5
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "aluminum_ingot",
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "id": "aluminum_casing",
+      "name": {
+        "de": "Aluminiumgehäuse",
+        "en": "Aluminum Casing"
+      },
+      "alternate": false,
+      "buildingId": "constructor",
+      "cycleSeconds": 2,
+      "inputs": [
+        {
+          "itemId": "aluminum_ingot",
+          "amount": 3
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "aluminum_casing",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "id": "cast_screw",
+      "name": {
+        "de": "Gussschraube",
+        "en": "Cast Screw"
+      },
+      "alternate": true,
+      "buildingId": "constructor",
+      "cycleSeconds": 24,
+      "inputs": [
+        {
+          "itemId": "iron_ingot",
+          "amount": 5
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "screw",
+          "amount": 20
+        }
+      ]
+    },
+    {
+      "id": "iron_wire",
+      "name": {
+        "de": "Eisendraht",
+        "en": "Iron Wire"
+      },
+      "alternate": true,
+      "buildingId": "constructor",
+      "cycleSeconds": 24,
+      "inputs": [
+        {
+          "itemId": "iron_ingot",
+          "amount": 5
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "wire",
+          "amount": 9
+        }
+      ]
+    },
+    {
+      "id": "solid_steel_ingot",
+      "name": {
+        "de": "Massiver Stahlbarren",
+        "en": "Solid Steel Ingot"
+      },
+      "alternate": true,
+      "buildingId": "foundry",
+      "cycleSeconds": 3,
+      "inputs": [
+        {
+          "itemId": "iron_ingot",
+          "amount": 2
+        },
+        {
+          "itemId": "coal",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "steel_ingot",
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "id": "steel_rod",
+      "name": {
+        "de": "Stahlstange",
+        "en": "Steel Rod"
+      },
+      "alternate": true,
+      "buildingId": "constructor",
+      "cycleSeconds": 5,
+      "inputs": [
+        {
+          "itemId": "steel_ingot",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "iron_rod",
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "id": "steel_screw",
+      "name": {
+        "de": "Stahlschraube",
+        "en": "Steel Screw"
+      },
+      "alternate": true,
+      "buildingId": "constructor",
+      "cycleSeconds": 12,
+      "inputs": [
+        {
+          "itemId": "steel_beam",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "screw",
+          "amount": 52
+        }
+      ]
+    },
+    {
+      "id": "stitched_iron_plate",
+      "name": {
+        "de": "Genähte Eisenplatte",
+        "en": "Stitched Iron Plate"
+      },
+      "alternate": true,
+      "buildingId": "assembler",
+      "cycleSeconds": 32,
+      "inputs": [
+        {
+          "itemId": "iron_plate",
+          "amount": 10
+        },
+        {
+          "itemId": "wire",
+          "amount": 20
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "reinforced_iron_plate",
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "id": "bolted_iron_plate",
+      "name": {
+        "de": "Verschraubte Eisenplatte",
+        "en": "Bolted Iron Plate"
+      },
+      "alternate": true,
+      "buildingId": "assembler",
+      "cycleSeconds": 12,
+      "inputs": [
+        {
+          "itemId": "iron_plate",
+          "amount": 18
+        },
+        {
+          "itemId": "screw",
+          "amount": 50
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "reinforced_iron_plate",
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "id": "bolted_frame",
+      "name": {
+        "de": "Verschraubter Rahmen",
+        "en": "Bolted Frame"
+      },
+      "alternate": true,
+      "buildingId": "assembler",
+      "cycleSeconds": 24,
+      "inputs": [
+        {
+          "itemId": "reinforced_iron_plate",
+          "amount": 3
+        },
+        {
+          "itemId": "screw",
+          "amount": 56
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "modular_frame",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "id": "copper_rotor",
+      "name": {
+        "de": "Kupferrotor",
+        "en": "Copper Rotor"
+      },
+      "alternate": true,
+      "buildingId": "assembler",
+      "cycleSeconds": 16,
+      "inputs": [
+        {
+          "itemId": "copper_sheet",
+          "amount": 6
+        },
+        {
+          "itemId": "screw",
+          "amount": 52
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "rotor",
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "id": "steel_rotor",
+      "name": {
+        "de": "Stahlrotor",
+        "en": "Steel Rotor"
+      },
+      "alternate": true,
+      "buildingId": "assembler",
+      "cycleSeconds": 12,
+      "inputs": [
+        {
+          "itemId": "steel_pipe",
+          "amount": 2
+        },
+        {
+          "itemId": "wire",
+          "amount": 6
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "rotor",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "iron_pipe",
+      "name": {
+        "de": "Eisenrohr",
+        "en": "Iron Pipe"
+      },
+      "alternate": true,
+      "buildingId": "constructor",
+      "cycleSeconds": 12,
+      "inputs": [
+        {
+          "itemId": "iron_ingot",
+          "amount": 20
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "steel_pipe",
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "id": "encased_industrial_pipe",
+      "name": {
+        "de": "Ummanteltes Industrierohr",
+        "en": "Encased Industrial Pipe"
+      },
+      "alternate": true,
+      "buildingId": "assembler",
+      "cycleSeconds": 15,
+      "inputs": [
+        {
+          "itemId": "steel_pipe",
+          "amount": 6
+        },
+        {
+          "itemId": "concrete",
+          "amount": 5
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "encased_industrial_beam",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "steeled_frame",
+      "name": {
+        "de": "Stahlrahmen",
+        "en": "Steeled Frame"
+      },
+      "alternate": true,
+      "buildingId": "assembler",
+      "cycleSeconds": 60,
+      "inputs": [
+        {
+          "itemId": "reinforced_iron_plate",
+          "amount": 2
+        },
+        {
+          "itemId": "steel_pipe",
+          "amount": 10
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "modular_frame",
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "id": "heavy_encased_frame",
+      "name": {
+        "de": "Schwerer ummantelter Rahmen",
+        "en": "Heavy Encased Frame"
+      },
+      "alternate": true,
+      "buildingId": "manufacturer",
+      "cycleSeconds": 64,
+      "inputs": [
+        {
+          "itemId": "modular_frame",
+          "amount": 8
+        },
+        {
+          "itemId": "encased_industrial_beam",
+          "amount": 10
+        },
+        {
+          "itemId": "steel_pipe",
+          "amount": 36
+        },
+        {
+          "itemId": "concrete",
+          "amount": 22
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "heavy_modular_frame",
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "id": "heavy_flexible_frame",
+      "name": {
+        "de": "Schwerer flexibler Rahmen",
+        "en": "Heavy Flexible Frame"
+      },
+      "alternate": true,
+      "buildingId": "manufacturer",
+      "cycleSeconds": 16,
+      "inputs": [
+        {
+          "itemId": "modular_frame",
+          "amount": 5
+        },
+        {
+          "itemId": "encased_industrial_beam",
+          "amount": 3
+        },
+        {
+          "itemId": "rubber",
+          "amount": 20
+        },
+        {
+          "itemId": "screw",
+          "amount": 104
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "heavy_modular_frame",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "pure_iron_ingot",
+      "name": {
+        "de": "Reiner Eisenbarren",
+        "en": "Pure Iron Ingot"
+      },
+      "alternate": true,
+      "buildingId": "refinery",
+      "cycleSeconds": 12,
+      "inputs": [
+        {
+          "itemId": "iron_ore",
+          "amount": 7
+        },
+        {
+          "itemId": "water",
+          "amount": 4
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "iron_ingot",
+          "amount": 13
+        }
+      ]
+    },
+    {
+      "id": "pure_copper_ingot",
+      "name": {
+        "de": "Reiner Kupferbarren",
+        "en": "Pure Copper Ingot"
+      },
+      "alternate": true,
+      "buildingId": "refinery",
+      "cycleSeconds": 24,
+      "inputs": [
+        {
+          "itemId": "copper_ore",
+          "amount": 6
+        },
+        {
+          "itemId": "water",
+          "amount": 4
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "copper_ingot",
+          "amount": 15
+        }
+      ]
+    },
+    {
+      "id": "wet_concrete",
+      "name": {
+        "de": "Nassbeton",
+        "en": "Wet Concrete"
+      },
+      "alternate": true,
+      "buildingId": "refinery",
+      "cycleSeconds": 3,
+      "inputs": [
+        {
+          "itemId": "limestone",
+          "amount": 6
+        },
+        {
+          "itemId": "water",
+          "amount": 5
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "concrete",
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "id": "recycled_plastic",
+      "name": {
+        "de": "Recycelter Kunststoff",
+        "en": "Recycled Plastic"
+      },
+      "alternate": true,
+      "buildingId": "refinery",
+      "cycleSeconds": 12,
+      "inputs": [
+        {
+          "itemId": "rubber",
+          "amount": 6
+        },
+        {
+          "itemId": "fuel",
+          "amount": 6
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "plastic",
+          "amount": 12
+        }
+      ]
+    },
+    {
+      "id": "recycled_rubber",
+      "name": {
+        "de": "Recyceltes Gummi",
+        "en": "Recycled Rubber"
+      },
+      "alternate": true,
+      "buildingId": "refinery",
+      "cycleSeconds": 12,
+      "inputs": [
+        {
+          "itemId": "plastic",
+          "amount": 6
+        },
+        {
+          "itemId": "fuel",
+          "amount": 6
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "rubber",
+          "amount": 12
+        }
+      ]
+    },
+    {
+      "id": "diluted_fuel",
+      "name": {
+        "de": "Verdünnter Treibstoff",
+        "en": "Diluted Fuel"
+      },
+      "alternate": true,
+      "buildingId": "blender",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "heavy_oil_residue",
+          "amount": 5
+        },
+        {
+          "itemId": "water",
+          "amount": 10
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "fuel",
+          "amount": 10
+        }
+      ]
+    },
+    {
+      "id": "heavy_oil_residue",
+      "name": {
+        "de": "Schwerölrückstand",
+        "en": "Heavy Oil Residue"
+      },
+      "alternate": true,
+      "buildingId": "refinery",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "crude_oil",
+          "amount": 3
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "heavy_oil_residue",
+          "amount": 4
+        },
+        {
+          "itemId": "polymer_resin",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "id": "polymer_resin",
+      "name": {
+        "de": "Polymerharz",
+        "en": "Polymer Resin"
+      },
+      "alternate": true,
+      "buildingId": "refinery",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "crude_oil",
+          "amount": 6
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "polymer_resin",
+          "amount": 13
+        },
+        {
+          "itemId": "heavy_oil_residue",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "id": "coke_steel_ingot",
+      "name": {
+        "de": "Koks-Stahlbarren",
+        "en": "Coke Steel Ingot"
+      },
+      "alternate": true,
+      "buildingId": "foundry",
+      "cycleSeconds": 12,
+      "inputs": [
+        {
+          "itemId": "iron_ore",
+          "amount": 15
+        },
+        {
+          "itemId": "petroleum_coke",
+          "amount": 15
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "steel_ingot",
+          "amount": 20
+        }
+      ]
+    },
+    {
+      "id": "copper_alloy_ingot",
+      "name": {
+        "de": "Kupferlegierungsbarren",
+        "en": "Copper Alloy Ingot"
+      },
+      "alternate": true,
+      "buildingId": "foundry",
+      "cycleSeconds": 6,
+      "inputs": [
+        {
+          "itemId": "copper_ore",
+          "amount": 5
+        },
+        {
+          "itemId": "iron_ore",
+          "amount": 5
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "copper_ingot",
+          "amount": 10
+        }
+      ]
+    },
+    {
+      "id": "iron_alloy_ingot",
+      "name": {
+        "de": "Eisenlegierungsbarren",
+        "en": "Iron Alloy Ingot"
+      },
+      "alternate": true,
+      "buildingId": "foundry",
+      "cycleSeconds": 12,
+      "inputs": [
+        {
+          "itemId": "iron_ore",
+          "amount": 8
+        },
+        {
+          "itemId": "copper_ore",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "iron_ingot",
+          "amount": 15
+        }
+      ]
+    },
+    {
+      "id": "coated_iron_plate",
+      "name": {
+        "de": "Beschichtete Eisenplatte",
+        "en": "Coated Iron Plate"
+      },
+      "alternate": true,
+      "buildingId": "assembler",
+      "cycleSeconds": 8,
+      "inputs": [
+        {
+          "itemId": "iron_ingot",
+          "amount": 5
+        },
+        {
+          "itemId": "plastic",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "iron_plate",
+          "amount": 10
+        }
+      ]
+    },
+    {
+      "id": "adhered_iron_plate",
+      "name": {
+        "de": "Haftende Eisenplatte",
+        "en": "Adhered Iron Plate"
+      },
+      "alternate": true,
+      "buildingId": "assembler",
+      "cycleSeconds": 16,
+      "inputs": [
+        {
+          "itemId": "iron_plate",
+          "amount": 3
+        },
+        {
+          "itemId": "rubber",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "reinforced_iron_plate",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "quickwire_stator",
+      "name": {
+        "de": "Schnelldraht-Stator",
+        "en": "Quickwire Stator"
+      },
+      "alternate": true,
+      "buildingId": "assembler",
+      "cycleSeconds": 15,
+      "inputs": [
+        {
+          "itemId": "steel_pipe",
+          "amount": 4
+        },
+        {
+          "itemId": "quickwire",
+          "amount": 15
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "stator",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "id": "caterium_wire",
+      "name": {
+        "de": "Cateriumdraht",
+        "en": "Caterium Wire"
+      },
+      "alternate": true,
+      "buildingId": "constructor",
+      "cycleSeconds": 4,
+      "inputs": [
+        {
+          "itemId": "caterium_ingot",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "wire",
+          "amount": 8
+        }
+      ]
+    },
+    {
+      "id": "steel_cast_plate",
+      "name": {
+        "de": "Stahlgussplatte",
+        "en": "Steel Cast Plate"
+      },
+      "alternate": true,
+      "buildingId": "foundry",
+      "cycleSeconds": 4,
+      "inputs": [
+        {
+          "itemId": "iron_ingot",
+          "amount": 1
+        },
+        {
+          "itemId": "steel_ingot",
+          "amount": 1
+        }
+      ],
+      "outputs": [
+        {
+          "itemId": "iron_plate",
+          "amount": 3
+        }
+      ]
+    }
+  ]
+}
