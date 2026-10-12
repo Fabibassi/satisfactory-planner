@@ -68,6 +68,7 @@ import de.fabrikplaner.core.data.GameData
 import de.fabrikplaner.core.graph.BalanceReport
 import de.fabrikplaner.core.graph.Camera
 import de.fabrikplaner.core.graph.CameraMath
+import de.fabrikplaner.core.graph.EdgeRouter
 import de.fabrikplaner.core.graph.FlowStatus
 import de.fabrikplaner.core.graph.GraphMetrics
 import de.fabrikplaner.core.graph.GraphPorts
@@ -81,8 +82,7 @@ import kotlin.math.hypot
 private data class PortRef(val nodeId: String, val itemId: String, val world: Offset)
 
 private data class EdgeDraw(
-    val start: Offset,
-    val end: Offset,
+    val points: List<Offset>,
     val liquid: Boolean,
     val letters: String,
     val colorKey: String,
@@ -121,6 +121,9 @@ fun FactoryCanvas(
     val onMoveEndState = rememberUpdatedState(onMoveEnd)
     val onConnectState = rememberUpdatedState(onConnect)
     var rubberBand by remember { mutableStateOf<Pair<Offset, Offset>?>(null) }
+    val routePoints = EdgeRouter.paths(plan.nodes, plan.edges, game).associate { route ->
+        route.edgeId to route.points.map { Offset(it.x, it.y) }
+    }
     val edgeDraws = plan.edges.mapNotNull { edge ->
         val from = plan.nodes.find { it.id == edge.fromNodeId } ?: return@mapNotNull null
         val to = plan.nodes.find { it.id == edge.toNodeId } ?: return@mapNotNull null
@@ -131,8 +134,7 @@ fun FactoryCanvas(
         val rate = balance?.edgeRates?.get(edge.id)
         val label = rate?.let { "${formatNumber(it, locale)} / min" } ?: ""
         EdgeDraw(
-            start = start,
-            end = end,
+            points = routePoints[edge.id]?.takeIf { it.size >= 2 } ?: listOf(start, end),
             liquid = item?.form == ItemForm.LIQUID || item?.form == ItemForm.GAS,
             letters = monogram(name),
             colorKey = edge.itemId,
@@ -242,12 +244,13 @@ fun FactoryCanvas(
                 Canvas(Modifier.size(8000.dp, 8000.dp)) {
                     fun px(world: Offset) = Offset(world.x * densityScale, world.y * densityScale)
                     edgeDraws.forEach { edge ->
-                        val start = px(edge.start)
-                        val end = px(edge.end)
-                        val mid = (start.x + end.x) / 2f
                         val path = Path().apply {
-                            moveTo(start.x, start.y)
-                            cubicTo(mid, start.y, mid, end.y, end.x, end.y)
+                            val first = px(edge.points.first())
+                            moveTo(first.x, first.y)
+                            edge.points.drop(1).forEach { point ->
+                                val next = px(point)
+                                lineTo(next.x, next.y)
+                            }
                         }
                         drawPath(path, if (edge.liquid) PipeLiquid else BeltSolid, style = Stroke(width = 5f))
                     }
@@ -273,7 +276,7 @@ fun FactoryCanvas(
             Canvas(Modifier.fillMaxSize()) {
                 val camera = Camera(scale, offset.x, offset.y)
                 edgeDraws.forEach { edge ->
-                    val mid = curveMidpoint(edge.start, edge.end)
+                    val mid = polylineMidpoint(edge.points)
                     val (sx, sy) = CameraMath.worldToScreen(mid.x, mid.y, camera, densityScale)
                     drawEdgeLabel(Offset(sx, sy), edge, textMeasurer)
                 }
@@ -296,13 +299,23 @@ fun FactoryCanvas(
     }
 }
 
-private fun curveMidpoint(start: Offset, end: Offset): Offset {
-    val midX = (start.x + end.x) / 2f
-    val c1 = Offset(midX, start.y)
-    val c2 = Offset(midX, end.y)
-    val t = 0.5f
-    val u = 1f - t
-    return start * (u * u * u) + c1 * (3f * u * u * t) + c2 * (3f * u * t * t) + end * (t * t * t)
+private fun polylineMidpoint(points: List<Offset>): Offset {
+    if (points.size < 2) return points.firstOrNull() ?: Offset.Zero
+    val lengths = points.zipWithNext { a, b -> hypot(b.x - a.x, b.y - a.y) }
+    val total = lengths.sum()
+    if (total < 0.01f) return points.first()
+    var remain = total / 2f
+    for (index in lengths.indices) {
+        val length = lengths[index]
+        if (remain <= length || index == lengths.lastIndex) {
+            val t = if (length < 0.01f) 0f else (remain / length).coerceIn(0f, 1f)
+            val start = points[index]
+            val end = points[index + 1]
+            return Offset(start.x + (end.x - start.x) * t, start.y + (end.y - start.y) * t)
+        }
+        remain -= length
+    }
+    return points.last()
 }
 
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawEdgeLabel(

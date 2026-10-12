@@ -194,6 +194,13 @@ class GraphTest {
     }
 
     @Test
+    fun routedEdgesMissForeignNodes() {
+        assertRoutesClear("motor", 10.0)
+        assertRoutesClear("heavy_modular_frame", 1.0)
+        assertRoutesClear("plastic", 20.0)
+    }
+
+    @Test
     fun portsPointAtTheConnectedNeighbor() {
         val plate = recipe("rip", "reinforced_iron_plate", 1.0, 400f).copy(y = 100f)
         val screws = recipe("scr", "screw", 1.0, 0f).copy(y = 0f)
@@ -208,6 +215,33 @@ class GraphTest {
         val platePort = GraphPorts.inputCenter(plate, "iron_plate", game, nodes, edges)
         assertEquals(plate.x, screwPort.first)
         assertTrue(screwPort.second < platePort.second)
+    }
+
+    private fun assertRoutesClear(itemId: String, rate: Double) {
+        val targets = listOf(TargetRate(itemId, rate))
+        val solved = ProductionSolver(game).solve(targets)
+        val graph = GraphLayout.fromSolution(solved, targets, game)
+        val routes = EdgeRouter.paths(graph.nodes, graph.edges, game)
+        assertEquals(graph.edges.size, routes.size, itemId)
+        val problems = EdgeRouter.violations(graph.nodes, graph.edges, routes, clearance = 4f)
+        assertTrue(problems.isEmpty(), "$itemId: ${problems.joinToString()}")
+        val byId = graph.nodes.associateBy { it.id }
+        var longEdges = 0
+        for (edge in graph.edges) {
+            val route = routes.single { it.edgeId == edge.id }
+            val from = byId.getValue(edge.fromNodeId)
+            val to = byId.getValue(edge.toNodeId)
+            val start = GraphPorts.outputCenter(from, edge.itemId, game, graph.nodes, graph.edges)
+            val end = GraphPorts.inputCenter(to, edge.itemId, game, graph.nodes, graph.edges)
+            val first = route.points.first()
+            val last = route.points.last()
+            assertTrue(abs(first.x - start.first) < 0.1f && abs(first.y - start.second) < 0.1f, "$itemId ${edge.id} start")
+            assertTrue(abs(last.x - end.first) < 0.1f && abs(last.y - end.second) < 0.1f, "$itemId ${edge.id} end")
+            val layers = graph.nodes.map { it.x }.distinct().sorted()
+            val span = layers.indexOf(to.x) - layers.indexOf(from.x)
+            if (span > 1) longEdges++
+        }
+        if (itemId == "motor") assertTrue(longEdges > 0, "motor plan should span layers")
     }
 
     private fun idOrderWithinLayers(nodes: List<GraphNode>): List<GraphNode> {

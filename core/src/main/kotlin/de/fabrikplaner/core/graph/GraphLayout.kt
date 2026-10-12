@@ -53,7 +53,8 @@ object GraphLayout {
         }
         val nodes = sources + recipeNodes + sinks
         val edges = connect(nodes, game)
-        return FactoryGraph(arrange(nodes, edges), edges)
+        val arranged = arrange(nodes, edges)
+        return FactoryGraph(EdgeRouter.openChannels(arranged, edges), edges)
     }
 
     /**
