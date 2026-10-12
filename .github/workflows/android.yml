@@ -2,7 +2,13 @@ name: Android Debug APK
 
 on:
   push:
+    branches:
+      - "**"
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -35,3 +41,34 @@ jobs:
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish debug APK on the rolling latest release
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cp app/build/outputs/apk/debug/app-debug.apk fabrikplaner-debug.apk
+          cat > release-notes.md <<EOF
+          Debug-APK aus Branch \`${GITHUB_REF_NAME}\`, Commit \`${GITHUB_SHA}\`.
+
+          Die Datei ist die APK selbst, kein ZIP.
+
+          Direkter Download: https://github.com/${GITHUB_REPOSITORY}/releases/download/latest/fabrikplaner-debug.apk
+          EOF
+          if gh release view latest >/dev/null 2>&1; then
+            gh release upload latest fabrikplaner-debug.apk --clobber
+            gh release edit latest \
+              --prerelease \
+              --latest=false \
+              --target "${GITHUB_SHA}" \
+              --title "Fabrikplaner Debug (latest)" \
+              --notes-file release-notes.md
+          else
+            gh release create latest fabrikplaner-debug.apk \
+              --prerelease \
+              --latest=false \
+              --target "${GITHUB_SHA}" \
+              --title "Fabrikplaner Debug (latest)" \
+              --notes-file release-notes.md
+          fi

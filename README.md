@@ -28,9 +28,13 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 Ohne Android Studio: In den Entwickleroptionen „Unbekannte Apps“ für den Dateimanager erlauben und die APK öffnen.
 
-### GitHub Actions
+### GitHub Actions und Release
 
-Der Workflow `.github/workflows/android.yml` läuft bei Push und Pull Request. Er führt die Solver-Tests aus und lädt die Debug-APK als Artifact `fabrikplaner-debug-apk` hoch (14 Tage). Im Actions-Lauf die Artifact-Datei herunterladen und wie oben installieren.
+Der Workflow `.github/workflows/android.yml` läuft bei Push, Pull Request und manuellem Start. Er führt die Solver-Tests aus. Zusätzlich liegt ein Actions-Artifact `fabrikplaner-debug-apk` bereit (14 Tage, als ZIP).
+
+Bei jedem Push aktualisiert derselbe Lauf das Pre-Release [latest](https://github.com/Fabibassi/satisfactory-planner/releases/tag/latest). Die Datei `fabrikplaner-debug.apk` hängt dort direkt an, ohne ZIP. In der GitHub-Android-App die Release-Seite öffnen und die APK antippen, oder diesen Link laden:
+
+https://github.com/Fabibassi/satisfactory-planner/releases/download/latest/fabrikplaner-debug.apk
 
 ## Tests
 
